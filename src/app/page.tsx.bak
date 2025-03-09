@@ -43,6 +43,18 @@ export default function Home() {
         setError(error.message);
       } else {
         setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
       }
     } finally {
       setLoading(false);
@@ -64,6 +76,18 @@ export default function Home() {
       setShowForm(false);
     } catch (error: unknown) {
       if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
         setError(error.message);
       } else {
         setError('An unknown error occurred');
@@ -92,6 +116,18 @@ export default function Home() {
         setError(error.message);
       } else {
         setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
       }
     }
   };
@@ -102,6 +138,18 @@ export default function Home() {
       loadSymptoms();
     } catch (error: unknown) {
       if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      } Error) {
         setError(error.message);
       } else {
         setError('An unknown error occurred');
@@ -153,23 +201,19 @@ export default function Home() {
               </div>
             )}
 
-            {!showForm && !editingCard && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                {cards.length === 0 ? (
-                  <div className="col-span-full text-center py-8 text-gray-500">
-                    No symptoms recorded yet. Add your first one!
-                  </div>
-                ) : (
-                  cards.map(card => (
-                    <SymptomCard
-                      key={card.id}
-                      card={card}
-                      onEdit={() => handleEdit(card)}
-                      onDelete={deleteCard}
-                    />
-                  ))
-                )}
+            {cards.length === 0 && !showForm && !editingCard ? (
+              <div className="text-center p-8 text-gray-500">
+                <p>No symptoms added yet. Add your first symptom to get started.</p>
               </div>
+            ) : (
+              cards.map((card) => (
+                <SymptomCard
+                  key={card.id}
+                  card={card}
+                  onDelete={deleteCard}
+                  onEdit={handleEdit}
+                />
+              ))
             )}
           </div>
         )}
