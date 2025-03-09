@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SymptomCard as SymptomCardType } from '@/types/symptom';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
   card: SymptomCardType;
@@ -12,16 +13,43 @@ interface Props {
 }
 
 export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }: Props) {
+  const [isFlipped, setIsFlipped] = useState(false);
   const formattedDate = formatDistanceToNow(new Date(card.createdAt), { addSuffix: true });
-
+  
+  const handleFlip = () => {
+    setIsFlipped(!isFlipped);
+  };
+  
   return (
-    <Card className="mb-4">
-      <CardHeader>
-        <CardTitle className="text-xl">{card.symptom}</CardTitle>
-        <div className="text-sm text-gray-500">{formattedDate}</div>
-      </CardHeader>
-
-      <CardContent>
+    <div className="mb-4">
+      <AnimatePresence initial={false} mode="wait">
+        {!isFlipped ? (
+          <motion.div
+            key="front"
+            initial={{ opacity: 0, rotateY: 90 }}
+            animate={{ opacity: 1, rotateY: 0 }}
+            exit={{ opacity: 0, rotateY: 90 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            style={{ perspective: "1000px" }}
+          >
+            <Card className="cursor-pointer" onClick={handleFlip} style={{ minHeight: '150px' }}>
+              <CardHeader>
+                <CardTitle className="text-xl">{card.symptom}</CardTitle>
+                <div className="text-sm text-gray-500">{formattedDate}</div>
+              </CardHeader>
+            </Card>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="back"
+            initial={{ opacity: 0, rotateY: -90 }}
+            animate={{ opacity: 1, rotateY: 0 }}
+            exit={{ opacity: 0, rotateY: -90 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            style={{ perspective: "1000px" }}
+          >
+            <Card className="cursor-pointer" onClick={handleFlip}>
+              <CardContent>
         {card.solutions.length > 0 && (
           <div className="mt-2">
             <h4 className="font-semibold mb-2">Solutions:</h4>
@@ -56,24 +84,34 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }
             <p className="text-gray-700">{card.notes}</p>
           </div>
         )}
-      </CardContent>
+              </CardContent>
 
-      {!readOnly && (
-        <CardFooter className="flex justify-end space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => onEdit(card)}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => onDelete(card.id)}
-          >
-            Delete
-          </Button>
-        </CardFooter>
-      )}
-    </Card>
+              {!readOnly && (
+                <CardFooter className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(card);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(card.id);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </CardFooter>
+              )}
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
