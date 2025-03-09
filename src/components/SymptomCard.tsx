@@ -15,12 +15,12 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }
   const formattedDate = formatDistanceToNow(new Date(card.createdAt), { addSuffix: true });
 
   return (
-    <Card className="mb-4 mx-4">
+    <Card className="mb-4">
       <CardHeader>
         <CardTitle className="text-xl">{card.symptom}</CardTitle>
         <div className="text-sm text-gray-500">{formattedDate}</div>
       </CardHeader>
-      
+
       <CardContent>
         {card.solutions.length > 0 && (
           <div className="mt-2">
@@ -57,17 +57,17 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }
           </div>
         )}
       </CardContent>
-      
+
       {!readOnly && (
         <CardFooter className="flex justify-end space-x-2">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => onEdit(card)}
           >
             Edit
           </Button>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             onClick={() => onDelete(card.id)}
           >
             Delete
