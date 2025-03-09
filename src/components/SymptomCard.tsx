@@ -15,11 +15,11 @@ interface Props {
 export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }: Props) {
   const [isFlipped, setIsFlipped] = useState(false);
   const formattedDate = formatDistanceToNow(new Date(card.createdAt), { addSuffix: true });
-  
+
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
   };
-  
+
   return (
     <div className="mb-4">
       <AnimatePresence initial={false} mode="wait">
@@ -32,7 +32,7 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }
             transition={{ duration: 0.25, ease: "easeOut" }}
             style={{ perspective: "1000px" }}
           >
-            <Card className="cursor-pointer" onClick={handleFlip} style={{ minHeight: '150px' }}>
+            <Card className="cursor-pointer" onClick={handleFlip}>
               <CardHeader>
                 <CardTitle className="text-xl">{card.symptom}</CardTitle>
                 <div className="text-sm text-gray-500">{formattedDate}</div>
