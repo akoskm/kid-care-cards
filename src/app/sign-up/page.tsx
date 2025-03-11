@@ -8,14 +8,16 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { LockIcon, Download } from 'lucide-react';
 
-export default function SignInPage() {
-  const { signIn: authSignIn, session } = useAuth();
+export default function SignUpPage() {
+  const { signUp: authSignUp, session } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   // Check for existing session only once on component mount
   useEffect(() => {
@@ -25,7 +27,7 @@ export default function SignInPage() {
     }
   }, [session, router]);
 
-  const handleSignIn = async () => {
+  const handleSignUp = async () => {
     if (!email || !password) {
       setError('Please enter both email and password');
       return;
@@ -33,15 +35,14 @@ export default function SignInPage() {
 
     try {
       setError(null);
+      setMessage(null);
       setLoading(true);
 
-      const { error } = await authSignIn(email, password);
+      const { error } = await authSignUp(email, password);
 
       if (error) throw error;
 
-      console.log('Sign in successful, redirecting to home');
-      // Redirect immediately to home page with a full page reload
-      router.push('/');
+      setMessage('Check your email for the confirmation link.');
 
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -54,12 +55,10 @@ export default function SignInPage() {
     }
   };
 
-
-
   // Handle Enter key press
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSignIn();
+      handleSignUp();
     }
   };
 
@@ -68,7 +67,7 @@ export default function SignInPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl text-center">Kid Care Cards</CardTitle>
-          <CardDescription className="text-center">Sign in to your account</CardDescription>
+          <CardDescription className="text-center">Create a new account</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
@@ -77,7 +76,11 @@ export default function SignInPage() {
             </Alert>
           )}
 
-
+          {message && (
+            <Alert className="mb-4">
+              <AlertDescription>{message}</AlertDescription>
+            </Alert>
+          )}
 
           <div className="space-y-4">
             <div className="space-y-2">
@@ -103,18 +106,29 @@ export default function SignInPage() {
 
             <Button
               className="w-full"
-              onClick={handleSignIn}
+              onClick={handleSignUp}
               disabled={loading}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Creating account...' : 'Create Account'}
             </Button>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <LockIcon className="h-4 w-4" />
+              <span>Your data is stored in encrypted format</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <Download className="h-4 w-4" />
+              <span>No lock-in. Export your data anytime you want</span>
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-center">
           <div className="text-sm text-muted-foreground">
-            Don't have an account?{' '}
-            <Link href="/sign-up" className="text-primary hover:underline">
-              Create account
+            Already have an account?{' '}
+            <Link href="/sign-in" className="text-primary hover:underline">
+              Sign in
             </Link>
           </div>
         </CardFooter>
