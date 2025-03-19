@@ -147,34 +147,78 @@ export const secureDataOperations = {
 
       if (symptomError) throw symptomError;
 
-      // Delete existing solutions
-      const { error: deleteError } = await supabase
-        .from('solutions')
-        .delete()
-        .eq('symptom_id', id);
-
-      if (deleteError) throw deleteError;
-
-      // Insert new solutions if any
+      // Handle solutions
       if (data.solutions && data.solutions.length > 0) {
-        const solutionsToInsert = await Promise.all(
-          data.solutions.map(async (solution: Solution) => {
-            const encryptedSolution = await encryptFields(solution, encryptedFields.solutions);
-            return {
-              symptom_id: id,
-              description: encryptedSolution.description,
-              effectiveness_rating: encryptedSolution.effectiveness_rating || null,
-              time_to_relief: encryptedSolution.time_to_relief || null,
-              notes: encryptedSolution.notes || null,
-            };
-          })
-        );
+        // Separate new and existing solutions
+        const existingSolutions = data.solutions.filter(s => s.id);
+        const newSolutions = data.solutions.filter(s => !s.id);
 
-        const { error: solutionsError } = await supabase
-          .from('solutions')
-          .insert(solutionsToInsert);
+        // Get the IDs of existing solutions that should remain
+        const existingSolutionIds = existingSolutions.map(s => s.id as string);
 
-        if (solutionsError) throw solutionsError;
+        if (existingSolutionIds.length > 0) {
+          // Delete solutions that are no longer present
+          const { error: deleteError } = await supabase
+            .from('solutions')
+            .delete()
+            .eq('symptom_id', id)
+            .not('id', 'in', existingSolutionIds);
+
+          if (deleteError) throw deleteError;
+        } else {
+          // If there are no existing solutions to keep, delete all solutions for this symptom
+          const { error: deleteError } = await supabase
+            .from('solutions')
+            .delete()
+            .eq('symptom_id', id);
+
+          if (deleteError) throw deleteError;
+        }
+
+        // Update existing solutions
+        if (existingSolutions.length > 0) {
+          const existingSolutionsToUpdate = await Promise.all(
+            existingSolutions.map(async (solution) => {
+              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions);
+              return {
+                id: solution.id,
+                symptom_id: id,
+                description: encryptedSolution.description,
+                effectiveness_rating: encryptedSolution.effectiveness_rating || null,
+                time_to_relief: encryptedSolution.time_to_relief || null,
+                notes: encryptedSolution.notes || null,
+              };
+            })
+          );
+
+          const { error: updateError } = await supabase
+            .from('solutions')
+            .upsert(existingSolutionsToUpdate);
+
+          if (updateError) throw updateError;
+        }
+
+        // Insert new solutions
+        if (newSolutions.length > 0) {
+          const newSolutionsToInsert = await Promise.all(
+            newSolutions.map(async (solution) => {
+              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions);
+              return {
+                symptom_id: id,
+                description: encryptedSolution.description,
+                effectiveness_rating: encryptedSolution.effectiveness_rating || null,
+                time_to_relief: encryptedSolution.time_to_relief || null,
+                notes: encryptedSolution.notes || null,
+              };
+            })
+          );
+
+          const { error: insertError } = await supabase
+            .from('solutions')
+            .insert(newSolutionsToInsert);
+
+          if (insertError) throw insertError;
+        }
       }
 
       // Fetch updated symptom with solutions
