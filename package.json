@@ -25,7 +25,6 @@
     "framer-motion": "^12.4.10",
     "lucide-react": "^0.479.0",
     "next": "15.2.1",
-    "next-pwa": "^5.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.2",
