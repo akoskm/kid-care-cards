@@ -14,6 +14,22 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { motion, AnimatePresence } from 'framer-motion';
 import { Child, Solution, SymptomInput } from '@/types/supabase-types';
 
+// Type for solutions in the form before they're saved to the database
+interface FormSolution {
+  description: string;
+  effectiveness_rating?: number;
+  time_to_relief?: string;
+  notes?: string;
+}
+
+// Helper function to convert FormSolution to Solution
+const toSolution = (formSolution: FormSolution): Partial<Solution> => ({
+  description: formSolution.description,
+  effectiveness_rating: formSolution.effectiveness_rating,
+  time_to_relief: formSolution.time_to_relief,
+  notes: formSolution.notes,
+});
+
 interface Props {
   onSubmit: (data: SymptomInput) => void;
   onCancel: () => void;
@@ -30,10 +46,14 @@ export default function SymptomForm({
   const [currentStep, setCurrentStep] = useState(1);
   const [symptom, setSymptom] = useState(initialData?.name || '');
   const [childId, setChildId] = useState<string>(initialData?.child_id || '');
-  const [solutions, setSolutions] = useState<Solution[]>(
-    initialData?.solutions || [{ description: '' }]
+  const [solutions, setSolutions] = useState<FormSolution[]>(
+    initialData?.solutions?.map(s => ({
+      description: s.description,
+      effectiveness_rating: s.effectiveness_rating || undefined,
+      time_to_relief: s.time_to_relief || undefined,
+      notes: s.notes || undefined,
+    })) || [{ description: '' }]
   );
-  const [notes, setNotes] = useState<string>(initialData?.notes || '');
   const [children, setChildren] = useState<Child[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,8 +91,7 @@ export default function SymptomForm({
       onSubmit({
         name: symptomName,
         child_id: childId,
-        solutions: solutions,
-        notes: notes.trim() || undefined,
+        solutions: solutions.map(toSolution) as Solution[],
       });
     }
   };
@@ -81,7 +100,7 @@ export default function SymptomForm({
     setSolutions([...solutions, { description: '' }]);
   };
 
-  const updateSolution = (index: number, field: keyof Solution, value: string | number | undefined) => {
+  const updateSolution = (index: number, field: keyof FormSolution, value: string | number | undefined) => {
     const newSolutions = [...solutions];
     newSolutions[index] = { ...newSolutions[index], [field]: value };
     setSolutions(newSolutions);
@@ -131,13 +150,13 @@ export default function SymptomForm({
         <CardTitle className="flex items-center justify-between">
           <span>{initialData ? 'Edit Symptom' : 'Add New Symptom'}</span>
           <div className="text-sm font-normal text-gray-500">
-            Step {currentStep} of 3
+            Step {currentStep} of 2
           </div>
         </CardTitle>
         <div className="w-full bg-gray-200 h-2 rounded-full mt-4">
           <div
             className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(currentStep / 3) * 100}%` }}
+            style={{ width: `${(currentStep / 2) * 100}%` }}
           />
         </div>
       </CardHeader>
@@ -264,25 +283,6 @@ export default function SymptomForm({
               </Button>
             </motion.div>
           )}
-
-          {currentStep === 3 && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-4"
-            >
-              <div>
-                <label className="block text-sm font-medium mb-1">Additional Notes</label>
-                <Textarea
-                  placeholder="Add any additional notes or observations"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="h-32"
-                />
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
       </CardContent>
 
@@ -301,7 +301,7 @@ export default function SymptomForm({
           <Button variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          {currentStep < 3 ? (
+          {currentStep < 2 ? (
             <Button
               onClick={() => setCurrentStep(currentStep + 1)}
               disabled={!canProceed()}
