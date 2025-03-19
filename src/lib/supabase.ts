@@ -38,7 +38,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 // Fields that should be encrypted in each table
 const encryptedFields = {
   symptoms: ['name', 'description', 'notes'] as const,
-  solutions: ['description', 'precautions', 'time_to_relief'] as const,
+  solutions: ['description', 'notes', 'time_to_relief'] as const,
   children: ['name'] as const,
 };
 
@@ -73,7 +73,7 @@ export const secureDataOperations = {
               description: encryptedSolution.description,
               effectiveness_rating: encryptedSolution.effectiveness_rating || null,
               time_to_relief: encryptedSolution.time_to_relief || null,
-              precautions: encryptedSolution.precautions || null,
+              notes: encryptedSolution.notes || null,
             };
           })
         );
@@ -100,7 +100,7 @@ export const secureDataOperations = {
           solutions (
             id,
             description,
-            precautions,
+            notes,
             effectiveness_rating,
             time_to_relief
           )
@@ -119,7 +119,7 @@ export const secureDataOperations = {
           (result.solutions as Solution[]).map(async (solution) =>
             await decryptFields(solution, encryptedFields.solutions)
           )
-        ) as any; // Use any here to bypass the type check
+        ) as Solution[];
       }
 
       return decryptedSymptom;
@@ -165,7 +165,7 @@ export const secureDataOperations = {
               description: encryptedSolution.description,
               effectiveness_rating: encryptedSolution.effectiveness_rating || null,
               time_to_relief: encryptedSolution.time_to_relief || null,
-              precautions: encryptedSolution.precautions || null,
+              notes: encryptedSolution.notes || null,
             };
           })
         );
@@ -192,7 +192,7 @@ export const secureDataOperations = {
           solutions (
             id,
             description,
-            precautions,
+            notes,
             effectiveness_rating,
             time_to_relief
           )
@@ -211,7 +211,7 @@ export const secureDataOperations = {
           (result.solutions as Solution[]).map(async (solution) =>
             await decryptFields(solution, encryptedFields.solutions)
           )
-        ) as any; // Use any here to bypass the type check
+        ) as Solution[];
       }
 
       return decryptedSymptom;
@@ -252,7 +252,7 @@ export const secureDataOperations = {
           solutions (
             id,
             description,
-            precautions,
+            notes,
             effectiveness_rating,
             time_to_relief
           )
@@ -274,7 +274,7 @@ export const secureDataOperations = {
               (symptom.solutions as Solution[]).map(async (solution) =>
                 await decryptFields(solution, encryptedFields.solutions)
               )
-            ) as any; // Use any here to bypass the type check
+            ) as Solution[];
           }
 
           return decryptedSymptom;
@@ -292,11 +292,11 @@ export const secureDataOperations = {
     try {
       // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         throw new Error('You must be logged in to add a child');
       }
-      
+
       const encryptedData = await encryptFields(data, encryptedFields.children);
 
       const { data: child, error } = await supabase
@@ -398,7 +398,7 @@ export const secureDataOperations = {
           solutions (
             id,
             description,
-            precautions,
+            notes,
             effectiveness_rating,
             time_to_relief
           )
@@ -417,7 +417,7 @@ export const secureDataOperations = {
               (symptom.solutions as Solution[]).map(async (solution) =>
                 await decryptFields(solution, encryptedFields.solutions)
               )
-            ) as any; // Use any here to bypass the type check
+            ) as Solution[];
           }
 
           return decryptedSymptom;
@@ -441,7 +441,7 @@ export const secureDataOperations = {
         if (symptom.solutions && symptom.solutions.length > 0) {
           return symptom.solutions.some(solution =>
             solution.description && solution.description.toLowerCase().includes(searchTermLower) ||
-            solution.precautions && solution.precautions.toLowerCase().includes(searchTermLower)
+            solution.notes && solution.notes.toLowerCase().includes(searchTermLower)
           );
         }
 
@@ -461,7 +461,7 @@ export const validateSymptom = (symptom: string): boolean => {
   return !!symptom && symptom.trim().length > 0 && symptom.trim().length <= 200;
 };
 
-export const validateSolutions = (solutions: Array<{description: string; effectiveness_rating?: number; time_to_relief?: string; precautions?: string;}>): boolean => {
+export const validateSolutions = (solutions: Array<{description: string; effectiveness_rating?: number; time_to_relief?: string; notes?: string;}>): boolean => {
   if (!solutions || solutions.length === 0) return true;
   return solutions.every(s => !!s.description && s.description.trim().length > 0 && s.description.trim().length <= 500);
 };

@@ -12,44 +12,13 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface Child {
-  id: string;
-  name: string;
-}
+import { Child, Solution, SymptomInput } from '@/types/supabase-types';
 
 interface Props {
-  onSubmit: (data: {
-    symptom: string;
-    childId: string;
-    solutions: Array<{
-      description: string;
-      effectiveness_rating?: number;
-      time_to_relief?: string;
-      precautions?: string;
-    }>;
-    notes?: string
-  }) => void;
+  onSubmit: (data: SymptomInput) => void;
   onCancel: () => void;
-  initialData?: {
-    symptom: string;
-    childId: string;
-    solutions: Array<{
-      description: string;
-      effectiveness_rating?: number;
-      time_to_relief?: string;
-      precautions?: string;
-    }>;
-    notes?: string;
-  };
+  initialData?: SymptomInput;
   submitLabel?: string;
-}
-
-interface Solution {
-  description: string;
-  effectiveness_rating?: number;
-  time_to_relief?: string;
-  precautions?: string;
 }
 
 export default function SymptomForm({
@@ -59,8 +28,8 @@ export default function SymptomForm({
   submitLabel = 'Save',
 }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [symptom, setSymptom] = useState(initialData?.symptom || '');
-  const [childId, setChildId] = useState<string>(initialData?.childId || '');
+  const [symptom, setSymptom] = useState(initialData?.name || '');
+  const [childId, setChildId] = useState<string>(initialData?.child_id || '');
   const [solutions, setSolutions] = useState<Solution[]>(
     initialData?.solutions || [{ description: '' }]
   );
@@ -100,8 +69,8 @@ export default function SymptomForm({
     const symptomName = symptom.trim();
     if (symptomName) {
       onSubmit({
-        symptom: symptomName,
-        childId,
+        name: symptomName,
+        child_id: childId,
         solutions: solutions,
         notes: notes.trim() || undefined,
       });
@@ -266,8 +235,8 @@ export default function SymptomForm({
                         placeholder={`e.g.:
 * Not recommended under 1 year old
 * Doctors number: 1234567890`}
-                        value={solution.precautions || ''}
-                        onChange={(e) => updateSolution(index, 'precautions', e.target.value)}
+                        value={solution.notes || ''}
+                        onChange={(e) => updateSolution(index, 'notes', e.target.value)}
                       />
                     </div>
 

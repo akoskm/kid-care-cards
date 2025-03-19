@@ -2,12 +2,14 @@
 
 // Make Solution compatible with Record<string, unknown>
 export interface Solution extends Record<string, unknown> {
-  id?: string;
-  symptom_id?: string;
+  id: string;
+  symptom_id: string;
   description: string;
   effectiveness_rating?: number | null;
   time_to_relief?: string | null;
-  precautions?: string | null;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Symptom {

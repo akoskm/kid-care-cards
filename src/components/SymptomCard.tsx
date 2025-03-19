@@ -67,9 +67,9 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }
                       Time to relief: {solution.time_to_relief}
                     </div>
                   )}
-                  {solution.precautions && (
+                  {solution.notes && (
                     <div className="text-sm text-gray-600">
-                      Precautions: {solution.precautions}
+                      Notes: {solution.notes}
                     </div>
                   )}
                 </li>

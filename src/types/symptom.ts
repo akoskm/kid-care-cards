@@ -1,13 +1,15 @@
-export interface SymptomCard {
-  id: string;
-  symptom: string;
-  solutions: Array<{
-    description: string;
-    effectiveness_rating?: number;
-    time_to_relief?: string;
-    precautions?: string;
-  }>;
-  notes?: string;
-  createdAt: string;
-  childId: string;
-}
+import { Symptom, Solution } from './supabase-types';
+
+export type SymptomCard = Omit<Symptom, 'description' | 'severity'> & {
+  symptom: string; // alias for name
+  childId: string; // alias for child_id
+  createdAt: string; // alias for created_at
+  solutions: Solution[];
+  severity?: number; // Make severity optional and non-nullable
+};
+
+// Helper type to convert between SymptomCard and SymptomInput
+export type SymptomCardToInput = Omit<SymptomCard, 'id' | 'createdAt' | 'symptom' | 'childId'> & {
+  name: string;
+  child_id: string;
+};

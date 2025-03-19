@@ -8,6 +8,7 @@ import MainLayout from './main-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { SymptomCard as SymptomCardType } from '@/types/symptom';
+import { SymptomInput } from '@/types/supabase-types';
 
 export default function Home() {
   const [cards, setCards] = useState<SymptomCardType[]>([]);
@@ -29,17 +30,10 @@ export default function Home() {
       const data = await secureDataOperations.getSymptoms();
 
       const formattedData: SymptomCardType[] = data.map(symptom => ({
-        id: symptom.id,
+        ...symptom,
         symptom: symptom.name,
         childId: symptom.child_id,
         createdAt: symptom.created_at,
-        solutions: symptom.solutions?.map(s => ({
-          description: s.description,
-          effectiveness_rating: s.effectiveness_rating,
-          time_to_relief: s.time_to_relief,
-          precautions: s.precautions
-        })) || [],
-        notes: symptom.notes,
       }));
 
       setCards(formattedData);
@@ -54,17 +48,11 @@ export default function Home() {
     }
   };
 
-  const addCard = async (data: Omit<SymptomCardType, 'id' | 'createdAt'>) => {
+  const addCard = async (data: SymptomInput) => {
     try {
       setError(null);
 
-      await secureDataOperations.insertSymptom({
-        name: data.symptom,
-        child_id: data.childId,
-        solutions: data.solutions,
-        notes: data.notes
-      });
-
+      await secureDataOperations.insertSymptom(data);
       loadSymptoms();
       setShowForm(false);
     } catch (error: unknown) {
@@ -76,19 +64,13 @@ export default function Home() {
     }
   };
 
-  const updateCard = async (data: Omit<SymptomCardType, 'id' | 'createdAt'>) => {
+  const updateCard = async (data: SymptomInput) => {
     if (!editingCard) return;
 
     try {
       setError(null);
 
-      await secureDataOperations.updateSymptom(editingCard.id, {
-        name: data.symptom,
-        child_id: data.childId,
-        solutions: data.solutions,
-        notes: data.notes
-      });
-
+      await secureDataOperations.updateSymptom(editingCard.id, data);
       loadSymptoms();
       setEditingCard(null);
       setShowForm(false);
@@ -127,23 +109,16 @@ export default function Home() {
     try {
       setIsSearching(true);
       setError(null);
-      
+
       const data = await secureDataOperations.searchSymptoms(searchTerm);
-      
+
       const formattedData: SymptomCardType[] = data.map(symptom => ({
-        id: symptom.id,
+        ...symptom,
         symptom: symptom.name,
         childId: symptom.child_id,
         createdAt: symptom.created_at,
-        solutions: symptom.solutions?.map(s => ({
-          description: s.description,
-          effectiveness_rating: s.effectiveness_rating,
-          time_to_relief: s.time_to_relief,
-          precautions: s.precautions
-        })) || [],
-        notes: symptom.notes,
       }));
-      
+
       setSearchResults(formattedData);
       setHasSearched(true);
     } catch (error: unknown) {
@@ -168,7 +143,7 @@ export default function Home() {
     <MainLayout>
       <div className="container mx-auto py-4">
         <h1 className="text-2xl font-bold mb-4 px-4">Symptoms</h1>
-        
+
         <div className="px-4 mb-4">
           <div className="flex space-x-2">
             <Input
@@ -178,7 +153,7 @@ export default function Home() {
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               className="flex-1"
             />
-            <Button 
+            <Button
               onClick={handleSearch}
               disabled={isSearching}
               className="bg-indigo-600 hover:bg-indigo-700"
@@ -186,7 +161,7 @@ export default function Home() {
               {isSearching ? 'Searching...' : 'Search'}
             </Button>
             {hasSearched && (
-              <Button 
+              <Button
                 onClick={clearSearch}
                 variant="outline"
                 className="border-gray-300"
@@ -196,7 +171,7 @@ export default function Home() {
             )}
           </div>
         </div>
-        
+
         {loading ? (
           <div className="p-4">
             <p className="text-gray-600">Loading symptoms...</p>
