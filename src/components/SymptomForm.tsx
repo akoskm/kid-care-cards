@@ -261,9 +261,11 @@ export default function SymptomForm({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1">Precautions</label>
+                      <label className="block text-sm font-medium mb-1">Notes</label>
                       <Textarea
-                        placeholder="Any precautions to note"
+                        placeholder={`e.g.:
+* Not recommended under 1 year old
+* Doctors number: 1234567890`}
                         value={solution.precautions || ''}
                         onChange={(e) => updateSolution(index, 'precautions', e.target.value)}
                       />
