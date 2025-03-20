@@ -69,11 +69,8 @@ export const secureDataOperations = {
           data.solutions.map(async (solution: Solution) => {
             const encryptedSolution = await encryptFields(solution, encryptedFields.solutions);
             return {
+              ...encryptedSolution,
               symptom_id: symptom.id,
-              description: encryptedSolution.description,
-              effectiveness_rating: encryptedSolution.effectiveness_rating || null,
-              time_to_relief: encryptedSolution.time_to_relief || null,
-              notes: encryptedSolution.notes || null,
             };
           })
         );
@@ -180,12 +177,8 @@ export const secureDataOperations = {
             existingSolutions.map(async (solution) => {
               const encryptedSolution = await encryptFields(solution, encryptedFields.solutions);
               return {
-                id: solution.id,
+                ...encryptedSolution,
                 symptom_id: id,
-                description: encryptedSolution.description,
-                effectiveness_rating: encryptedSolution.effectiveness_rating || null,
-                time_to_relief: encryptedSolution.time_to_relief || null,
-                notes: encryptedSolution.notes || null,
               };
             })
           );
@@ -203,11 +196,8 @@ export const secureDataOperations = {
             newSolutions.map(async (solution) => {
               const encryptedSolution = await encryptFields(solution, encryptedFields.solutions);
               return {
+                ...encryptedSolution,
                 symptom_id: id,
-                description: encryptedSolution.description,
-                effectiveness_rating: encryptedSolution.effectiveness_rating || null,
-                time_to_relief: encryptedSolution.time_to_relief || null,
-                notes: encryptedSolution.notes || null,
               };
             })
           );
