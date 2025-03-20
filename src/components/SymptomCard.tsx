@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
+import { StarRating } from '@/components/ui/star-rating';
 
 interface Props {
   card: SymptomCardType;
@@ -60,8 +61,9 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false, 
                 <li key={index}>
                   <div className="font-medium">{solution.description}</div>
                   {solution.effectiveness_rating && (
-                    <div className="text-sm text-gray-600">
-                      Effectiveness: {solution.effectiveness_rating}/5
+                    <div className="text-sm text-gray-600 flex items-center gap-2">
+                      <span>Effectiveness:</span>
+                      <StarRating value={solution.effectiveness_rating} onChange={() => {}} readOnly className="scale-75" />
                     </div>
                   )}
                   {solution.time_to_relief && (
@@ -70,7 +72,7 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false, 
                     </div>
                   )}
                   {solution.notes && (
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 mt-1">
                       Notes: {solution.notes}
                     </div>
                   )}

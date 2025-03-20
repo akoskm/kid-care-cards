@@ -3,6 +3,7 @@ import { secureDataOperations } from '@/lib/supabase';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { StarRating } from '@/components/ui/star-rating';
 import {
   Select,
   SelectContent,
@@ -232,27 +233,21 @@ export default function SymptomForm({
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Effectiveness</label>
-                        <Input
-                          type="number"
-                          min="1"
-                          max="5"
-                          placeholder="1-5"
-                          value={solution.effectiveness_rating || ''}
-                          onChange={(e) => updateSolution(index, 'effectiveness_rating', parseInt(e.target.value) || undefined)}
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Effectiveness</label>
+                      <StarRating
+                        value={solution.effectiveness_rating}
+                        onChange={(value) => updateSolution(index, 'effectiveness_rating', value)}
+                      />
+                    </div>
 
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Time to relief</label>
-                        <Input
-                          placeholder="e.g. 30 minutes"
-                          value={solution.time_to_relief || ''}
-                          onChange={(e) => updateSolution(index, 'time_to_relief', e.target.value)}
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Time to relief</label>
+                      <Input
+                        placeholder="e.g. 30 minutes"
+                        value={solution.time_to_relief || ''}
+                        onChange={(e) => updateSolution(index, 'time_to_relief', e.target.value)}
+                      />
                     </div>
 
                     <div>
