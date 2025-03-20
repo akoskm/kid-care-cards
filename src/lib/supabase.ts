@@ -293,6 +293,7 @@ export const secureDataOperations = {
           created_at,
           solutions (
             id,
+            symptom_id,
             description,
             notes,
             effectiveness_rating,
@@ -438,6 +439,7 @@ export const secureDataOperations = {
           created_at,
           solutions (
             id,
+            symptom_id,
             description,
             notes,
             effectiveness_rating,

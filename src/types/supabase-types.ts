@@ -35,7 +35,7 @@ export interface SymptomInput extends Record<string, unknown> {
   name: string;
   child_id: string;
   severity?: number;
-  age_group?: string;
+  age_group?: string | null;
   notes?: string | null;
   solutions?: Solution[];
 }
