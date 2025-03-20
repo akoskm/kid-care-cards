@@ -4,15 +4,17 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 
 interface Props {
   card: SymptomCardType;
   onDelete: (id: string) => void;
   onEdit: (card: SymptomCardType) => void;
   readOnly?: boolean;
+  isDeleting?: boolean;
 }
 
-export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }: Props) {
+export default function SymptomCard({ card, onDelete, onEdit, readOnly = false, isDeleting = false }: Props) {
   const [isFlipped, setIsFlipped] = useState(false);
   const formattedDate = formatDistanceToNow(new Date(card.createdAt), { addSuffix: true });
 
@@ -94,6 +96,7 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }
                       e.stopPropagation();
                       onEdit(card);
                     }}
+                    disabled={isDeleting}
                   >
                     Edit
                   </Button>
@@ -103,8 +106,16 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false }
                       e.stopPropagation();
                       onDelete(card.id);
                     }}
+                    disabled={isDeleting}
                   >
-                    Delete
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      'Delete'
+                    )}
                   </Button>
                 </CardFooter>
               )}

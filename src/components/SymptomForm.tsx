@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Child, Solution, SymptomInput } from '@/types/supabase-types';
+import { Loader2 } from 'lucide-react';
 
 // Type for solutions in the form before they're saved to the database
 interface FormSolution {
@@ -56,6 +57,7 @@ export default function SymptomForm({
   );
   const [children, setChildren] = useState<Child[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadChildren = React.useCallback(async () => {
@@ -80,7 +82,7 @@ export default function SymptomForm({
     loadChildren();
   }, [loadChildren]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!childId) {
       setError('Please select a child');
       return;
@@ -88,11 +90,16 @@ export default function SymptomForm({
 
     const symptomName = symptom.trim();
     if (symptomName) {
-      onSubmit({
-        name: symptomName,
-        child_id: childId,
-        solutions: solutions.map(toSolution) as Solution[],
-      });
+      setSaving(true);
+      try {
+        await onSubmit({
+          name: symptomName,
+          child_id: childId,
+          solutions: solutions.map(toSolution) as Solution[],
+        });
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
@@ -292,19 +299,20 @@ export default function SymptomForm({
             <Button
               variant="outline"
               onClick={() => setCurrentStep(currentStep - 1)}
+              disabled={saving}
             >
               Previous
             </Button>
           )}
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" onClick={onCancel} disabled={saving}>
             Cancel
           </Button>
           {currentStep < 2 ? (
             <Button
               onClick={() => setCurrentStep(currentStep + 1)}
-              disabled={!canProceed()}
+              disabled={!canProceed() || saving}
             >
               Next
             </Button>
@@ -312,8 +320,16 @@ export default function SymptomForm({
             <Button
               onClick={handleSubmit}
               className="bg-indigo-600 hover:bg-indigo-700"
+              disabled={saving}
             >
-              {submitLabel}
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                submitLabel
+              )}
             </Button>
           )}
         </div>
