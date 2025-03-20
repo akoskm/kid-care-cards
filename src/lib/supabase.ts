@@ -114,12 +114,11 @@ export const secureDataOperations = {
       const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms);
 
       if (result.solutions) {
-        // Use type assertion to resolve the type mismatch
         decryptedSymptom.solutions = await Promise.all(
-          (result.solutions as Solution[]).map(async (solution) =>
+          result.solutions.map(async (solution) =>
             await decryptFields(solution, encryptedFields.solutions)
           )
-        ) as Solution[];
+        );
       }
 
       return decryptedSymptom;
@@ -250,12 +249,11 @@ export const secureDataOperations = {
       const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms);
 
       if (result.solutions) {
-        // Use type assertion to resolve the type mismatch
         decryptedSymptom.solutions = await Promise.all(
-          (result.solutions as Solution[]).map(async (solution) =>
+          result.solutions.map(async (solution) =>
             await decryptFields(solution, encryptedFields.solutions)
           )
-        ) as Solution[];
+        );
       }
 
       return decryptedSymptom;
@@ -313,12 +311,11 @@ export const secureDataOperations = {
           const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms);
 
           if (symptom.solutions && symptom.solutions.length > 0) {
-            // Use type assertion to resolve the type mismatch
             decryptedSymptom.solutions = await Promise.all(
-              (symptom.solutions as Solution[]).map(async (solution) =>
+              symptom.solutions.map(async (solution) =>
                 await decryptFields(solution, encryptedFields.solutions)
               )
-            ) as Solution[];
+            );
           }
 
           return decryptedSymptom;
@@ -456,12 +453,11 @@ export const secureDataOperations = {
           const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms);
 
           if (symptom.solutions) {
-            // Use type assertion to resolve the type mismatch
             decryptedSymptom.solutions = await Promise.all(
-              (symptom.solutions as Solution[]).map(async (solution) =>
+              symptom.solutions.map(async (solution) =>
                 await decryptFields(solution, encryptedFields.solutions)
               )
-            ) as Solution[];
+            );
           }
 
           return decryptedSymptom;
