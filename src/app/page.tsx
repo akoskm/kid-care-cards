@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { SymptomCard as SymptomCardType } from '@/types/symptom';
 import { SymptomInput } from '@/types/supabase-types';
+import { VoiceRecorder } from '@/components/VoiceRecorder';
 
 export default function Home() {
   const [cards, setCards] = useState<SymptomCardType[]>([]);
@@ -197,17 +198,6 @@ export default function Home() {
                 submitLabel="Update"
               />
             ) : (
-              <div className="px-4 mb-4">
-                <Button
-                  onClick={() => setShowForm(true)}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700"
-                >
-                  Add New Symptom
-                </Button>
-              </div>
-            )}
-
-            {!showForm && !editingCard && (
               <div>
                 {hasSearched ? (
                   <div>
@@ -232,22 +222,33 @@ export default function Home() {
                     )}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                    {cards.length === 0 ? (
-                      <div className="col-span-full text-center py-8 text-gray-500">
-                        No symptoms recorded yet. Add your first one!
-                      </div>
-                    ) : (
-                      cards.map(card => (
-                        <SymptomCard
-                          key={card.id}
-                          card={card}
-                          onEdit={() => handleEdit(card)}
-                          onDelete={deleteCard}
-                        />
-                      ))
-                    )}
-                  </div>
+                  <>
+                    <div className="px-4 mb-4 flex items-center gap-2">
+                      <Button
+                        onClick={() => setShowForm(true)}
+                        className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+                      >
+                        Add New Symptom
+                      </Button>
+                      <VoiceRecorder onSuccess={loadSymptoms} />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                      {cards.length === 0 ? (
+                        <div className="col-span-full text-center py-8 text-gray-500">
+                          No symptoms recorded yet. Add your first one!
+                        </div>
+                      ) : (
+                        cards.map(card => (
+                          <SymptomCard
+                            key={card.id}
+                            card={card}
+                            onEdit={() => handleEdit(card)}
+                            onDelete={deleteCard}
+                          />
+                        ))
+                      )}
+                    </div>
+                  </>
                 )}
               </div>
             )}
