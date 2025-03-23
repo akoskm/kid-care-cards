@@ -7,7 +7,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.3.0'
+import OpenAI from 'https://esm.sh/openai@4.28.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -35,10 +35,9 @@ serve(async (req) => {
     }
 
     // Initialize OpenAI client
-    const configuration = new Configuration({
+    const openai = new OpenAI({
       apiKey: Deno.env.get('OPENAI_API_KEY'),
     })
-    const openai = new OpenAIApi(configuration)
 
     // Convert base64 audio to buffer
     console.log("Converting audio to buffer...");
@@ -48,30 +47,15 @@ serve(async (req) => {
     // Transcribe audio using OpenAI Whisper
     console.log("Starting transcription...");
     const audioBlob = new Blob([audioBuffer], { type: 'audio/webm' });
+    const audioFile = new File([audioBlob], 'audio.webm', { type: 'audio/webm' });
 
-    // Create form data according to OpenAI's documentation
-    const formData = new FormData();
-    formData.append('file', audioBlob, 'audio.webm');
-    formData.append('model', 'whisper-1');
-    formData.append('response_format', 'json');
-    formData.append('temperature', '0');
-    formData.append('language', 'en');
-
-    // Make the request directly to OpenAI's API
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-      },
-      body: formData,
+    const transcription = await openai.audio.transcriptions.create({
+      file: audioFile,
+      model: "whisper-1",
+      response_format: "json",
+      temperature: 0,
+      language: "en"
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`OpenAI API error: ${errorData.error?.message || response.statusText}`);
-    }
-
-    const transcription = await response.json();
     console.log("Transcription received:", transcription.text);
 
     // Process the transcription to extract symptoms and solutions
@@ -98,31 +82,15 @@ serve(async (req) => {
     Transcription: ${transcription.text}`
 
     console.log("Sending prompt to GPT...");
-
-    // Make the request directly to OpenAI's chat completion API
-    const chatResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-        max_tokens: 500,
-      }),
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 500,
     });
-
-    if (!chatResponse.ok) {
-      const errorData = await chatResponse.json();
-      throw new Error(`OpenAI Chat API error: ${errorData.error?.message || chatResponse.statusText}`);
-    }
-
-    const chatCompletion = await chatResponse.json();
     console.log("GPT response received");
 
-    const extractedData = JSON.parse(chatCompletion.choices[0].message?.content || '{}')
+    const extractedData = JSON.parse(completion.choices[0].message?.content || '{}')
     console.log("Extracted data:", JSON.stringify(extractedData, null, 2));
 
     // Initialize Supabase client
