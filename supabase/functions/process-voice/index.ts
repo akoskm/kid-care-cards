@@ -73,8 +73,7 @@ serve(async (req) => {
         {
           "description": "solution description",
           "effectiveness_rating": number (1-5),
-          "time_to_relief": "estimated time",
-          "precautions": "any precautions"
+          "time_to_relief": "estimated time"
         }
       ]
     }
@@ -127,7 +126,6 @@ serve(async (req) => {
           description: solution.description,
           effectiveness_rating: solution.effectiveness_rating,
           time_to_relief: solution.time_to_relief,
-          precautions: solution.precautions,
         }))
 
         const { error: solutionsError } = await supabaseClient

@@ -77,7 +77,7 @@ export interface Database {
           description: string
           effectiveness_rating: number | null
           time_to_relief: string | null
-          precautions: string | null
+          notes: string | null
           created_at: string
           updated_at: string
         }
@@ -87,7 +87,7 @@ export interface Database {
           description: string
           effectiveness_rating?: number | null
           time_to_relief?: string | null
-          precautions?: string | null
+          notes?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -97,7 +97,7 @@ export interface Database {
           description?: string
           effectiveness_rating?: number | null
           time_to_relief?: string | null
-          precautions?: string | null
+          notes?: string | null
           created_at?: string
           updated_at?: string
         }

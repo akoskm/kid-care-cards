@@ -53,7 +53,7 @@ export const secureDataOperations = {
         .from('symptoms')
         .insert({
           name: encryptedData.name,
-          child_id: data.child_id,
+          child_id: data.child_id || null,
           severity: data.severity || 1,
           age_group: data.age_group || 'all',
           notes: encryptedData.notes || null,

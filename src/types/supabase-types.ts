@@ -15,7 +15,7 @@ export interface Solution extends Record<string, unknown> {
 // Base interface for common symptom fields
 interface BaseSymptom {
   name: string;
-  child_id: string;
+  child_id?: string;
   severity?: number | null;
   age_group?: string | null;
   notes?: string | null;

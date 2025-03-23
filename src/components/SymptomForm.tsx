@@ -84,18 +84,13 @@ export default function SymptomForm({
   }, [loadChildren]);
 
   const handleSubmit = async () => {
-    if (!childId) {
-      setError('Please select a child');
-      return;
-    }
-
     const symptomName = symptom.trim();
     if (symptomName) {
       setSaving(true);
       try {
         await onSubmit({
           name: symptomName,
-          child_id: childId,
+          child_id: childId || undefined,
           solutions: solutions.map(toSolution) as Solution[],
         });
       } finally {
@@ -122,7 +117,7 @@ export default function SymptomForm({
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return childId && symptom.trim();
+        return symptom.trim();
       case 2:
         return solutions.some(s => s.description.trim());
       default:
@@ -135,18 +130,6 @@ export default function SymptomForm({
       <Card className="mx-4 my-4">
         <CardContent className="pt-6">
           <p>Loading children...</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (children.length === 0) {
-    return (
-      <Card className="mx-4 my-4">
-        <CardContent className="pt-6">
-          <p className="text-red-500">
-            Please add a child first in the Children tab
-          </p>
         </CardContent>
       </Card>
     );
@@ -185,10 +168,10 @@ export default function SymptomForm({
               className="space-y-4"
             >
               <div>
-                <label className="block text-sm font-medium mb-1">Child</label>
+                <label className="block text-sm font-medium mb-1">Child (Optional)</label>
                 <Select value={childId} onValueChange={setChildId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a child" />
+                    <SelectValue placeholder="Select a child (optional)" />
                   </SelectTrigger>
                   <SelectContent>
                     {children.map((child) => (
