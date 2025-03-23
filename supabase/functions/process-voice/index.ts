@@ -11,7 +11,7 @@ import OpenAI from 'https://esm.sh/openai@4.28.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-user-id',
 }
 
 console.log("Hello from Functions!")
@@ -108,7 +108,8 @@ serve(async (req) => {
           severity: symptom.severity,
           age_group: symptom.age_group,
           notes: symptom.notes,
-          child_id: req.headers.get('x-child-id') || null,
+          child_id: null,
+          user_id: req.headers.get('x-user-id') || null,
         })
         .select()
         .single()

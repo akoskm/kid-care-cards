@@ -55,6 +55,12 @@ export function VoiceRecorder({ childId, onSuccess }: VoiceRecorderProps) {
     try {
       setIsProcessing(true);
 
+      // Get the current user's ID
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) {
+        throw new Error('You must be logged in to use voice recording');
+      }
+
       // Convert audio to base64
       const reader = new FileReader();
       reader.readAsDataURL(audioBlob);
@@ -66,7 +72,9 @@ export function VoiceRecorder({ childId, onSuccess }: VoiceRecorderProps) {
         // Call the Edge Function
         const { data, error } = await supabase.functions.invoke('process-voice', {
           body: { audio: base64Data },
-          headers: childId ? { 'x-child-id': childId } : undefined,
+          headers: {
+            'x-user-id': session.user.id,
+          },
         });
 
         if (error) throw error;
