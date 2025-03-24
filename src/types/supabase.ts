@@ -38,7 +38,7 @@ export interface Database {
       symptoms: {
         Row: {
           id: string
-          child_id: string
+          child_id: string | null
           name: string
           description: string | null
           severity: number
@@ -49,7 +49,7 @@ export interface Database {
         }
         Insert: {
           id?: string
-          child_id: string
+          child_id?: string | null
           name: string
           description?: string | null
           severity?: number
@@ -60,7 +60,7 @@ export interface Database {
         }
         Update: {
           id?: string
-          child_id?: string
+          child_id?: string | null
           name?: string
           description?: string | null
           severity?: number

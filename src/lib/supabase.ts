@@ -46,6 +46,12 @@ const encryptedFields = {
 export const secureDataOperations = {
   async insertSymptom(data: SymptomInput) {
     try {
+      // Get the current user's ID
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) {
+        throw new Error('You must be logged in to add symptoms');
+      }
+
       const encryptedData = await encryptFields(data, encryptedFields.symptoms);
 
       // First, insert the symptom
@@ -57,6 +63,7 @@ export const secureDataOperations = {
           severity: data.severity || 1,
           age_group: data.age_group || 'all',
           notes: encryptedData.notes || null,
+          user_id: session.user.id,
         })
         .select('id, name, description, notes, child_id, severity, age_group, created_at')
         .single();
@@ -270,6 +277,12 @@ export const secureDataOperations = {
 
   async getSymptoms() {
     try {
+      // Get the current user's ID
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) {
+        throw new Error('You must be logged in to view symptoms');
+      }
+
       const { data, error } = await supabase
         .from('symptoms')
         .select(`
@@ -290,6 +303,7 @@ export const secureDataOperations = {
             time_to_relief
           )
         `)
+        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
