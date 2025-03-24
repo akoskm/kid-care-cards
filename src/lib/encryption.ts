@@ -1,27 +1,25 @@
 import CryptoJS from 'crypto-js';
-import { supabase } from './supabase';
 
 // Key derivation function to generate encryption key from user's UUID
-const deriveEncryptionKey = async (): Promise<string> => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user?.id) {
+const deriveEncryptionKey = (userId: string): string => {
+  if (!userId) {
     throw new Error('No user ID available');
   }
 
   // Use only the user's UUID for key derivation with a random MD5 hash as salt
   // This is stable and doesn't change between sessions
   const salt = 'e10adc3949ba59abbe56e057f20f883e'; // MD5 hash for additional security
-  
-  return CryptoJS.PBKDF2(session.user.id, salt, {
+
+  return CryptoJS.PBKDF2(userId, salt, {
     keySize: 256 / 32,
     iterations: 1000
   }).toString();
 };
 
 // Encrypt data with proper error handling
-export const encryptData = async (data: unknown): Promise<string> => {
+export const encryptData = (data: unknown, userId: string): string => {
   try {
-    const key = await deriveEncryptionKey();
+    const key = deriveEncryptionKey(userId);
     const jsonString = JSON.stringify(data);
 
     // Add a version and timestamp to the encrypted data
@@ -39,9 +37,9 @@ export const encryptData = async (data: unknown): Promise<string> => {
 };
 
 // Decrypt data with proper error handling and validation
-export const decryptData = async (encryptedData: string): Promise<unknown> => {
+export const decryptData = (encryptedData: string, userId: string): unknown => {
   try {
-    const key = await deriveEncryptionKey();
+    const key = deriveEncryptionKey(userId);
     const bytes = CryptoJS.AES.decrypt(encryptedData, key);
     const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
 
@@ -68,16 +66,17 @@ export const decryptData = async (encryptedData: string): Promise<unknown> => {
 };
 
 // Encrypt specific fields in an object
-export const encryptFields = async <T extends Record<string, unknown>>(
+export const encryptFields = <T extends Record<string, unknown>>(
   data: T,
-  fieldsToEncrypt: readonly (keyof T)[]
-): Promise<T> => {
+  fieldsToEncrypt: readonly (keyof T)[],
+  userId: string
+): T => {
   try {
     const encryptedData = { ...data };
 
     for (const field of fieldsToEncrypt) {
       if (data[field] !== undefined && data[field] !== null) {
-        encryptedData[field] = await encryptData(data[field]) as T[typeof field];
+        encryptedData[field] = encryptData(data[field], userId) as T[typeof field];
       }
     }
 
@@ -89,16 +88,17 @@ export const encryptFields = async <T extends Record<string, unknown>>(
 };
 
 // Decrypt specific fields in an object
-export const decryptFields = async <T extends Record<string, unknown>>(
+export const decryptFields = <T extends Record<string, unknown>>(
   data: T,
-  fieldsToDecrypt: readonly (keyof T)[]
-): Promise<T> => {
+  fieldsToDecrypt: readonly (keyof T)[],
+  userId: string
+): T => {
   try {
     const decryptedData = { ...data };
 
     for (const field of fieldsToDecrypt) {
       if (data[field] !== undefined && data[field] !== null) {
-        const decrypted = await decryptData(data[field] as string);
+        const decrypted = decryptData(data[field] as string, userId);
         // Only update the field if decryption was successful
         if (decrypted !== null) {
           decryptedData[field] = decrypted as T[typeof field];

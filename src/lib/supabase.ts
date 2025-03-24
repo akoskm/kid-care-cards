@@ -11,6 +11,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
+async function safeGetUserId() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) {
+    throw new Error('You must be logged in to update symptoms');
+  }
+  return session.user.id;
+}
+
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
@@ -47,12 +55,9 @@ export const secureDataOperations = {
   async insertSymptom(data: SymptomInput) {
     try {
       // Get the current user's ID
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.id) {
-        throw new Error('You must be logged in to add symptoms');
-      }
+      const userId  = await safeGetUserId();
 
-      const encryptedData = await encryptFields(data, encryptedFields.symptoms);
+      const encryptedData = await encryptFields(data, encryptedFields.symptoms, userId);
 
       // First, insert the symptom
       const { data: symptom, error: symptomError } = await supabase
@@ -63,7 +68,7 @@ export const secureDataOperations = {
           severity: data.severity || 1,
           age_group: data.age_group || 'all',
           notes: encryptedData.notes || null,
-          user_id: session.user.id,
+          user_id: userId,
         })
         .select('id, name, description, notes, child_id, severity, age_group, created_at')
         .single();
@@ -74,7 +79,7 @@ export const secureDataOperations = {
       if (data.solutions && data.solutions.length > 0) {
         const solutionsToInsert = await Promise.all(
           data.solutions.map(async (solution: Solution) => {
-            const encryptedSolution = await encryptFields(solution, encryptedFields.solutions);
+            const encryptedSolution = await encryptFields(solution, encryptedFields.solutions, userId);
             return {
               ...encryptedSolution,
               symptom_id: symptom.id,
@@ -115,12 +120,12 @@ export const secureDataOperations = {
       if (fetchError) throw fetchError;
 
       // Decrypt the data before returning
-      const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms);
+      const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms, userId);
 
       if (result.solutions) {
         decryptedSymptom.solutions = await Promise.all(
           result.solutions.map(async (solution) =>
-            await decryptFields(solution, encryptedFields.solutions)
+            await decryptFields(solution, encryptedFields.solutions, userId)
           )
         );
       }
@@ -134,7 +139,9 @@ export const secureDataOperations = {
 
   async updateSymptom(id: string, data: SymptomInput) {
     try {
-      const encryptedData = await encryptFields(data, encryptedFields.symptoms);
+      // Get the current user's ID
+      const userId = await safeGetUserId();
+      const encryptedData = await encryptFields(data, encryptedFields.symptoms, userId);
 
       // First update the symptom
       const { error: symptomError } = await supabase
@@ -182,7 +189,7 @@ export const secureDataOperations = {
         if (existingSolutions.length > 0) {
           const existingSolutionsToUpdate = await Promise.all(
             existingSolutions.map(async (solution) => {
-              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions);
+              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions, userId);
               return {
                 ...encryptedSolution,
                 symptom_id: id,
@@ -201,7 +208,7 @@ export const secureDataOperations = {
         if (newSolutions.length > 0) {
           const newSolutionsToInsert = await Promise.all(
             newSolutions.map(async (solution) => {
-              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions);
+              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions, userId);
               return {
                 ...encryptedSolution,
                 symptom_id: id,
@@ -243,12 +250,12 @@ export const secureDataOperations = {
       if (fetchError) throw fetchError;
 
       // Decrypt the data before returning
-      const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms);
+      const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms, userId);
 
       if (result.solutions) {
         decryptedSymptom.solutions = await Promise.all(
           result.solutions.map(async (solution) =>
-            await decryptFields(solution, encryptedFields.solutions)
+            await decryptFields(solution, encryptedFields.solutions, userId)
           )
         );
       }
@@ -278,10 +285,7 @@ export const secureDataOperations = {
   async getSymptoms() {
     try {
       // Get the current user's ID
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.id) {
-        throw new Error('You must be logged in to view symptoms');
-      }
+      const userId = await safeGetUserId();
 
       const { data, error } = await supabase
         .from('symptoms')
@@ -303,7 +307,7 @@ export const secureDataOperations = {
             time_to_relief
           )
         `)
-        .eq('user_id', session.user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -313,12 +317,12 @@ export const secureDataOperations = {
       // Decrypt all symptoms and their solutions
       const decryptedSymptoms = await Promise.all(
         data.map(async (symptom) => {
-          const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms);
+          const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms, userId);
 
           if (symptom.solutions && symptom.solutions.length > 0) {
             decryptedSymptom.solutions = await Promise.all(
               symptom.solutions.map(async (solution) =>
-                await decryptFields(solution, encryptedFields.solutions)
+                await decryptFields(solution, encryptedFields.solutions, userId)
               )
             );
           }
@@ -337,27 +341,24 @@ export const secureDataOperations = {
   async insertChild(data: ChildInput) {
     try {
       // Get the current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const userId = await safeGetUserId();
 
-      if (!user) {
-        throw new Error('You must be logged in to add a child');
-      }
 
-      const encryptedData = await encryptFields(data, encryptedFields.children);
+      const encryptedData = await encryptFields(data, encryptedFields.children, userId);
 
       const { data: child, error } = await supabase
         .from('children')
         .insert({
           name: encryptedData.name,
           date_of_birth: data.date_of_birth,
-          user_id: user.id, // Associate the child with the current user
+          user_id: userId, // Associate the child with the current user
         })
         .select('id, name, date_of_birth')
         .single();
 
       if (error) throw error;
 
-      const decryptedChild = await decryptFields(child, encryptedFields.children);
+      const decryptedChild = await decryptFields(child, encryptedFields.children, userId);
       return decryptedChild;
     } catch (error) {
       console.error('Insert child failed:', error);
@@ -367,7 +368,10 @@ export const secureDataOperations = {
 
   async updateChild(id: string, data: ChildInput) {
     try {
-      const encryptedData = await encryptFields(data, encryptedFields.children);
+      // Get the current user
+      const userId = await safeGetUserId();
+
+      const encryptedData = await encryptFields(data, encryptedFields.children, userId);
 
       const { data: child, error } = await supabase
         .from('children')
@@ -381,7 +385,7 @@ export const secureDataOperations = {
 
       if (error) throw error;
 
-      const decryptedChild = await decryptFields(child, encryptedFields.children);
+      const decryptedChild = await decryptFields(child, encryptedFields.children, userId);
       return decryptedChild;
     } catch (error) {
       console.error('Update child failed:', error);
@@ -406,6 +410,9 @@ export const secureDataOperations = {
 
   async getChildren() {
     try {
+      // Get the current user
+      const userId = await safeGetUserId();
+
       const { data, error } = await supabase
         .from('children')
         .select('id, name, date_of_birth')
@@ -417,7 +424,7 @@ export const secureDataOperations = {
 
       // Decrypt all children names
       const decryptedChildren = await Promise.all(
-        data.map(child => decryptFields(child, encryptedFields.children))
+        data.map(child => decryptFields(child, encryptedFields.children, userId))
       );
 
       return decryptedChildren;
@@ -429,6 +436,9 @@ export const secureDataOperations = {
 
   async searchSymptoms(searchTerm: string) {
     try {
+      // Get the current user
+      const userId = await safeGetUserId();
+
       // Get all symptoms with their solutions
       const { data, error } = await supabase
         .from('symptoms')
@@ -456,12 +466,12 @@ export const secureDataOperations = {
       // Decrypt all the data
       const decryptedData = await Promise.all(
         data.map(async (symptom) => {
-          const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms);
+          const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms, userId);
 
           if (symptom.solutions) {
             decryptedSymptom.solutions = await Promise.all(
               symptom.solutions.map(async (solution) =>
-                await decryptFields(solution, encryptedFields.solutions)
+                await decryptFields(solution, encryptedFields.solutions, userId)
               )
             );
           }
