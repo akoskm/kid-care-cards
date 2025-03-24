@@ -1,7 +1,8 @@
-import CryptoJS from 'crypto-js';
+// Remove the import and add the type
+export type CryptoJSType = typeof import('crypto-js');
 
 // Key derivation function to generate encryption key from user's UUID
-const deriveEncryptionKey = (userId: string): string => {
+const deriveEncryptionKey = (userId: string, CryptoJS: CryptoJSType): string => {
   if (!userId) {
     throw new Error('No user ID available');
   }
@@ -17,9 +18,9 @@ const deriveEncryptionKey = (userId: string): string => {
 };
 
 // Encrypt data with proper error handling
-export const encryptData = (data: unknown, userId: string): string => {
+export const encryptData = (data: unknown, userId: string, CryptoJS: CryptoJSType): string => {
   try {
-    const key = deriveEncryptionKey(userId);
+    const key = deriveEncryptionKey(userId, CryptoJS);
     const jsonString = JSON.stringify(data);
 
     // Add a version and timestamp to the encrypted data
@@ -37,9 +38,9 @@ export const encryptData = (data: unknown, userId: string): string => {
 };
 
 // Decrypt data with proper error handling and validation
-export const decryptData = (encryptedData: string, userId: string): unknown => {
+export const decryptData = (encryptedData: string, userId: string, CryptoJS: CryptoJSType): unknown => {
   try {
-    const key = deriveEncryptionKey(userId);
+    const key = deriveEncryptionKey(userId, CryptoJS);
     const bytes = CryptoJS.AES.decrypt(encryptedData, key);
     const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
 
@@ -58,9 +59,6 @@ export const decryptData = (encryptedData: string, userId: string): unknown => {
     return JSON.parse(parsed.data);
   } catch (error) {
     console.error('Decryption failed:', error);
-
-    // Return null for invalid/corrupted data instead of throwing
-    // This allows the application to handle missing/corrupt data gracefully
     return null;
   }
 };
@@ -69,14 +67,15 @@ export const decryptData = (encryptedData: string, userId: string): unknown => {
 export const encryptFields = <T extends Record<string, unknown>>(
   data: T,
   fieldsToEncrypt: readonly (keyof T)[],
-  userId: string
+  userId: string,
+  CryptoJS: CryptoJSType
 ): T => {
   try {
     const encryptedData = { ...data };
 
     for (const field of fieldsToEncrypt) {
       if (data[field] !== undefined && data[field] !== null) {
-        encryptedData[field] = encryptData(data[field], userId) as T[typeof field];
+        encryptedData[field] = encryptData(data[field], userId, CryptoJS) as T[typeof field];
       }
     }
 
@@ -91,14 +90,15 @@ export const encryptFields = <T extends Record<string, unknown>>(
 export const decryptFields = <T extends Record<string, unknown>>(
   data: T,
   fieldsToDecrypt: readonly (keyof T)[],
-  userId: string
+  userId: string,
+  CryptoJS: CryptoJSType
 ): T => {
   try {
     const decryptedData = { ...data };
 
     for (const field of fieldsToDecrypt) {
       if (data[field] !== undefined && data[field] !== null) {
-        const decrypted = decryptData(data[field] as string, userId);
+        const decrypted = decryptData(data[field] as string, userId, CryptoJS);
         // Only update the field if decryption was successful
         if (decrypted !== null) {
           decryptedData[field] = decrypted as T[typeof field];
