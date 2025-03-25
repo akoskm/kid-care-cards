@@ -8,10 +8,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import OpenAI from 'https://esm.sh/openai@4.28.0'
+import { encryptObjectFields } from './encryption.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-user-id',
+}
+
+// Fields that should be encrypted in each table
+const encryptedFields = {
+  symptoms: ['name', 'notes'] as const,
+  solutions: ['description', 'time_to_relief'] as const,
 }
 
 console.log("Hello from Functions!")
@@ -101,15 +108,25 @@ serve(async (req) => {
     // Insert symptoms and solutions into the database
     for (const symptom of extractedData.symptoms) {
       console.log("Inserting symptom:", symptom.name);
+
+      // Get the user ID from the request headers
+      const userId = req.headers.get('x-user-id');
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+
+      // Encrypt the symptom data
+      const encryptedSymptom = encryptObjectFields(symptom, encryptedFields.symptoms, userId);
+
       const { data: symptomData, error: symptomError } = await supabaseClient
         .from('symptoms')
         .insert({
-          name: symptom.name,
+          name: encryptedSymptom.name,
           severity: symptom.severity,
           age_group: symptom.age_group,
-          notes: symptom.notes,
+          notes: encryptedSymptom.notes,
           child_id: null,
-          user_id: req.headers.get('x-user-id') || null,
+          user_id: userId,
         })
         .select()
         .single()
@@ -122,7 +139,13 @@ serve(async (req) => {
       // Insert solutions for this symptom
       if (extractedData.solutions && symptomData) {
         console.log("Inserting solutions for symptom:", symptom.name);
-        const solutionsToInsert = extractedData.solutions.map(solution => ({
+
+        // Encrypt the solutions data
+        const encryptedSolutions = extractedData.solutions.map(solution =>
+          encryptObjectFields(solution, encryptedFields.solutions, userId)
+        );
+
+        const solutionsToInsert = encryptedSolutions.map(solution => ({
           symptom_id: symptomData.id,
           description: solution.description,
           effectiveness_rating: solution.effectiveness_rating,
