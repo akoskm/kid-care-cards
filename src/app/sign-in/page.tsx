@@ -25,7 +25,9 @@ export default function SignInPage() {
     }
   }, [session, router]);
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!email || !password) {
       setError('Please enter both email and password');
       return;
@@ -41,7 +43,7 @@ export default function SignInPage() {
 
       console.log('Sign in successful, redirecting to home');
       // Redirect immediately to home page with a full page reload
-      router.push('/');
+      router.push('/symptoms');
 
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -51,15 +53,6 @@ export default function SignInPage() {
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-
-
-  // Handle Enter key press
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSignIn();
     }
   };
 
@@ -77,17 +70,15 @@ export default function SignInPage() {
             </Alert>
           )}
 
-
-
-          <div className="space-y-4">
+          <form onSubmit={handleSignIn} className="space-y-4">
             <div className="space-y-2">
               <Input
                 placeholder="Email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={handleKeyDown}
                 autoCapitalize="none"
+                required
               />
             </div>
 
@@ -97,22 +88,22 @@ export default function SignInPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={handleKeyDown}
+                required
               />
             </div>
 
             <Button
+              type="submit"
               className="w-full"
-              onClick={handleSignIn}
               disabled={loading}
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
-          </div>
+          </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <div className="text-sm text-muted-foreground">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/sign-up" className="text-primary hover:underline">
               Create account
             </Link>

@@ -23,11 +23,13 @@ export default function SignUpPage() {
   useEffect(() => {
     // Check if we already have a session
     if (session) {
-      router.push('/');
+      router.push('/symptoms');
     }
   }, [session, router]);
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!email || !password) {
       setError('Please enter both email and password');
       return;
@@ -55,13 +57,6 @@ export default function SignUpPage() {
     }
   };
 
-  // Handle Enter key press
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSignUp();
-    }
-  };
-
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -82,15 +77,15 @@ export default function SignUpPage() {
             </Alert>
           )}
 
-          <div className="space-y-4">
+          <form onSubmit={handleSignUp} className="space-y-4">
             <div className="space-y-2">
               <Input
                 placeholder="Email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={handleKeyDown}
                 autoCapitalize="none"
+                required
               />
             </div>
 
@@ -100,18 +95,18 @@ export default function SignUpPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={handleKeyDown}
+                required
               />
             </div>
 
             <Button
+              type="submit"
               className="w-full"
-              onClick={handleSignUp}
               disabled={loading}
             >
               {loading ? 'Creating account...' : 'Create Account'}
             </Button>
-          </div>
+          </form>
 
           <div className="mt-6 space-y-4">
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
