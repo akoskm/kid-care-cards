@@ -136,7 +136,7 @@ export default function SymptomForm({
   }
 
   return (
-    <Card className="mx-4 my-4">
+    <Card className="mx-4 my-4 mb-20">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{initialData ? 'Edit Symptom' : 'Add New Symptom'}</span>
@@ -271,7 +271,7 @@ export default function SymptomForm({
         </AnimatePresence>
       </CardContent>
 
-      <CardFooter className="flex justify-between space-x-2">
+      <CardFooter className="flex justify-between space-x-8">
         <div>
           {currentStep > 1 && (
             <Button
