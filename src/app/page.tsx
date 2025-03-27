@@ -15,9 +15,8 @@ export default function Home() {
               </Link>
             </div>
             <div className="hidden md:flex space-x-6">
-              <Link href="#features" className="text-gray-600 hover:text-gray-900">Features</Link>
-              <Link href="#benefits" className="text-gray-600 hover:text-gray-900">Benefits</Link>
-              <Link href="#testimonials" className="text-gray-600 hover:text-gray-900">Testimonials</Link>
+              <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
+              <a href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</a>
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/sign-in" className="text-emerald-600 hover:text-emerald-700">
@@ -69,7 +68,7 @@ export default function Home() {
         </div>
 
         {/* Mission Section */}
-        <div className="bg-gray-50 py-16">
+        <div id="features" className="bg-gray-50 py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-4">
               Our mission is to help you track health better
@@ -135,7 +134,7 @@ export default function Home() {
         </div>
 
         {/* Pricing Section */}
-        <div className="bg-emerald-500 py-16">
+        <div id="pricing" className="bg-emerald-500 py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-center text-white mb-4">
               Try Kid Care Cards free for 14 days
