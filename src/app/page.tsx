@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import MainLayout from './main-layout';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -51,9 +52,18 @@ export default function Home() {
                 Get Started
               </Link>
             </div>
-            <div className="hidden md:block">
-              {/* You'll need to add an appropriate illustration here */}
-              <div className="bg-emerald-50 rounded-lg p-8 h-96"></div>
+            <div className="hidden md:flex justify-center items-center">
+              <div className="relative w-full max-w-lg">
+                <Image
+                  src="/hero.jpg"
+                  alt="Parent using Kid Care Cards app while child sleeps"
+                  width={600}
+                  height={600}
+                  className="rounded-lg shadow-lg"
+                  style={{ objectFit: 'cover' }}
+                  priority
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -123,6 +133,143 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Pricing Section */}
+        <div className="bg-emerald-500 py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-4xl font-bold text-center text-white mb-4">
+              Try Kid Care Cards free for 14 days
+            </h2>
+            <p className="text-center text-white text-lg mb-12">
+              If you are not satisfied with your experience, cancel at any time. There are no contracts.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {/* Monthly Plan */}
+              <div className="bg-white rounded-lg p-8 shadow-lg">
+                <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                  MONTHLY PLAN
+                </div>
+                <div className="flex items-baseline mb-8">
+                  <span className="text-5xl font-bold">$5</span>
+                  <span className="text-gray-600 ml-2">/mo</span>
+                </div>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    No-charge setup!
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    All features included
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Cancel anytime
+                  </li>
+                </ul>
+                <Link
+                  href="/sign-up"
+                  className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
+                >
+                  Get started
+                </Link>
+              </div>
+
+              {/* Yearly Plan */}
+              <div className="bg-white rounded-lg p-8 shadow-lg">
+                <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                  YEARLY PLAN
+                </div>
+                <div className="flex items-baseline mb-8">
+                  <span className="text-5xl font-bold">$50</span>
+                  <span className="text-gray-600 ml-2">/year</span>
+                </div>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save $10 annually
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    All features included
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Cancel anytime
+                  </li>
+                </ul>
+                <Link
+                  href="/sign-up"
+                  className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
+                >
+                  Get started
+                </Link>
+              </div>
+            </div>
+
+            <div className="text-center mt-12">
+              <Link
+                href="/sign-up"
+                className="inline-block bg-white text-emerald-600 px-8 py-3 rounded-lg hover:bg-emerald-50 transition-colors"
+              >
+                Request demo
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-gray-300 py-12">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-4 gap-8">
+              <div>
+                <Link href="/" className="text-2xl font-semibold text-white mb-4 block">
+                  Kid Care Cards
+                </Link>
+                <p className="text-gray-400 mb-4">
+                  A symptom tracking system built by parents for parents. We exist to help you focus on your children, not paperwork.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-4">Product</h3>
+                <ul className="space-y-2">
+                  <li><Link href="#features" className="hover:text-white">Features</Link></li>
+                  <li><Link href="#pricing" className="hover:text-white">Pricing</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-4">Support</h3>
+                <ul className="space-y-2">
+                  <li><Link href="#help" className="hover:text-white">Help Center</Link></li>
+                  <li><Link href="#contact" className="hover:text-white">Contact Us</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-4">Legal</h3>
+                <ul className="space-y-2">
+                  <li><Link href="/privacy" className="hover:text-white">Privacy</Link></li>
+                  <li><Link href="/terms" className="hover:text-white">Terms</Link></li>
+                </ul>
+              </div>
+            </div>
+            <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+              <p>&copy; {new Date().getFullYear()} Kid Care Cards. All rights reserved.</p>
+            </div>
+          </div>
+        </footer>
       </div>
     </MainLayout>
   );
