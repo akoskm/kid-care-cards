@@ -3,7 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Mic, Square } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/supabase';
-import { Overlay } from '@/components/ui/overlay';
+import { AudioLines } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface VoiceRecorderProps {
   onSuccess?: () => void;
@@ -124,9 +131,19 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
           )}
         </Button>
       </div>
-      {isProcessing && (
-        <Overlay>Processing your recording...</Overlay>
-      )}
+      <Dialog open={isProcessing}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AudioLines className="h-5 w-5 animate-pulse" />
+              Processing Recording
+            </DialogTitle>
+            <DialogDescription>
+              Please wait while we process your voice recording. This may take a few moments.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
