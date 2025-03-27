@@ -21,7 +21,7 @@ export default function SignInPage() {
   useEffect(() => {
     // Check if we already have a session
     if (session) {
-      router.push('/');
+      router.push('/symptoms');
     }
   }, [session, router]);
 
