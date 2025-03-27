@@ -131,7 +131,7 @@ export default function ChildrenPage() {
               <div className="px-4 mb-4">
                 <Button
                   onClick={() => setShowForm(true)}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700"
+                  className="w-full bg-primary hover:bg-emerald-700"
                 >
                   Add New Child
                 </Button>

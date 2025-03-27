@@ -146,7 +146,7 @@ export default function SymptomForm({
         </CardTitle>
         <div className="w-full bg-gray-200 h-2 rounded-full mt-4">
           <div
-            className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+            className="bg-primary h-2 rounded-full transition-all duration-300"
             style={{ width: `${(currentStep / 2) * 100}%` }}
           />
         </div>
@@ -297,7 +297,7 @@ export default function SymptomForm({
           ) : (
             <Button
               onClick={handleSubmit}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-primary hover:bg-emerald-700"
               disabled={saving}
             >
               {saving ? (
