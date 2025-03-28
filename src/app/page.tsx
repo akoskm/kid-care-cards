@@ -1,10 +1,8 @@
 import Link from 'next/link';
-import MainLayout from './main-layout';
 import Image from 'next/image';
 
 export default function Home() {
   return (
-    <MainLayout>
       <div className="min-h-screen">
         {/* Navigation */}
         <nav className="bg-white py-4 px-6 border-b">
@@ -270,6 +268,5 @@ export default function Home() {
           </div>
         </footer>
       </div>
-    </MainLayout>
   );
 }
