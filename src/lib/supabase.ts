@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import CryptoJS from 'crypto-js';
 import { encryptFields, decryptFields } from './encryption';
 import { Database } from '../types/supabase';
-import { Solution, SymptomInput, ChildInput } from '../types/supabase-types';
+import { Solution, SymptomInput, ChildInput, Symptom } from '../types/supabase-types';
 
 // Use environment variables for Supabase credentials
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -58,7 +57,7 @@ export const secureDataOperations = {
       // Get the current user's ID
       const userId  = await safeGetUserId();
 
-      const encryptedData = await encryptFields(data, encryptedFields.symptoms, userId, CryptoJS);
+      const encryptedData = await encryptFields(data, encryptedFields.symptoms, userId);
 
       // First, insert the symptom
       const { data: symptom, error: symptomError } = await supabase
@@ -68,10 +67,9 @@ export const secureDataOperations = {
           child_id: data.child_id || null,
           severity: data.severity || 1,
           age_group: data.age_group || 'all',
-          notes: encryptedData.notes || null,
           user_id: userId,
         })
-        .select('id, name, description, notes, child_id, severity, age_group, created_at')
+        .select('id, name, child_id, severity, age_group, created_at')
         .single();
 
       if (symptomError) throw symptomError;
@@ -80,7 +78,7 @@ export const secureDataOperations = {
       if (data.solutions && data.solutions.length > 0) {
         const solutionsToInsert = await Promise.all(
           data.solutions.map(async (solution: Solution) => {
-            const encryptedSolution = await encryptFields(solution, encryptedFields.solutions, userId, CryptoJS);
+            const encryptedSolution = await encryptFields(solution, encryptedFields.solutions, userId);
             return {
               ...encryptedSolution,
               symptom_id: symptom.id,
@@ -119,12 +117,12 @@ export const secureDataOperations = {
       if (fetchError) throw fetchError;
 
       // Decrypt the data before returning
-      const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms, userId, CryptoJS);
+      const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms, userId);
 
       if (result.solutions) {
         decryptedSymptom.solutions = await Promise.all(
           result.solutions.map(async (solution) =>
-            await decryptFields(solution, encryptedFields.solutions, userId, CryptoJS)
+            await decryptFields(solution, encryptedFields.solutions, userId)
           )
         );
       }
@@ -140,7 +138,7 @@ export const secureDataOperations = {
     try {
       // Get the current user's ID
       const userId = await safeGetUserId();
-      const encryptedData = await encryptFields(data, encryptedFields.symptoms, userId, CryptoJS);
+      const encryptedData = await encryptFields(data, encryptedFields.symptoms, userId);
 
       // First update the symptom
       const { error: symptomError } = await supabase
@@ -187,7 +185,7 @@ export const secureDataOperations = {
         if (existingSolutions.length > 0) {
           const existingSolutionsToUpdate = await Promise.all(
             existingSolutions.map(async (solution) => {
-              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions, userId, CryptoJS);
+              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions, userId);
               return {
                 ...encryptedSolution,
                 symptom_id: id,
@@ -206,7 +204,7 @@ export const secureDataOperations = {
         if (newSolutions.length > 0) {
           const newSolutionsToInsert = await Promise.all(
             newSolutions.map(async (solution) => {
-              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions, userId, CryptoJS);
+              const encryptedSolution = await encryptFields(solution, encryptedFields.solutions, userId);
               return {
                 ...encryptedSolution,
                 symptom_id: id,
@@ -246,12 +244,12 @@ export const secureDataOperations = {
       if (fetchError) throw fetchError;
 
       // Decrypt the data before returning
-      const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms, userId, CryptoJS);
+      const decryptedSymptom = await decryptFields(result, encryptedFields.symptoms, userId);
 
       if (result.solutions) {
         decryptedSymptom.solutions = await Promise.all(
           result.solutions.map(async (solution) =>
-            await decryptFields(solution, encryptedFields.solutions, userId, CryptoJS)
+            await decryptFields(solution, encryptedFields.solutions, userId)
           )
         );
       }
@@ -311,12 +309,12 @@ export const secureDataOperations = {
       // Decrypt all symptoms and their solutions
       const decryptedSymptoms = await Promise.all(
         data.map(async (symptom) => {
-          const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms, userId, CryptoJS);
+          const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms, userId);
 
           if (symptom.solutions && symptom.solutions.length > 0) {
             decryptedSymptom.solutions = await Promise.all(
               symptom.solutions.map(async (solution) =>
-                await decryptFields(solution, encryptedFields.solutions, userId, CryptoJS)
+                await decryptFields(solution, encryptedFields.solutions, userId)
               )
             );
           }
@@ -338,7 +336,7 @@ export const secureDataOperations = {
       const userId = await safeGetUserId();
 
 
-      const encryptedData = await encryptFields(data, encryptedFields.children, userId, CryptoJS);
+      const encryptedData = await encryptFields(data, encryptedFields.children, userId);
 
       const { data: child, error } = await supabase
         .from('children')
@@ -352,7 +350,7 @@ export const secureDataOperations = {
 
       if (error) throw error;
 
-      const decryptedChild = await decryptFields(child, encryptedFields.children, userId, CryptoJS);
+      const decryptedChild = await decryptFields(child, encryptedFields.children, userId);
       return decryptedChild;
     } catch (error) {
       console.error('Insert child failed:', error);
@@ -365,7 +363,7 @@ export const secureDataOperations = {
       // Get the current user
       const userId = await safeGetUserId();
 
-      const encryptedData = await encryptFields(data, encryptedFields.children, userId, CryptoJS);
+      const encryptedData = await encryptFields(data, encryptedFields.children, userId);
 
       const { data: child, error } = await supabase
         .from('children')
@@ -379,7 +377,7 @@ export const secureDataOperations = {
 
       if (error) throw error;
 
-      const decryptedChild = await decryptFields(child, encryptedFields.children, userId, CryptoJS);
+      const decryptedChild = await decryptFields(child, encryptedFields.children, userId);
       return decryptedChild;
     } catch (error) {
       console.error('Update child failed:', error);
@@ -418,7 +416,7 @@ export const secureDataOperations = {
 
       // Decrypt all children names
       const decryptedChildren = await Promise.all(
-        data.map(child => decryptFields(child, encryptedFields.children, userId, CryptoJS))
+        data.map(child => decryptFields(child, encryptedFields.children, userId))
       );
 
       return decryptedChildren;
@@ -458,12 +456,12 @@ export const secureDataOperations = {
       // Decrypt all the data
       const decryptedData = await Promise.all(
         data.map(async (symptom) => {
-          const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms, userId, CryptoJS);
+          const decryptedSymptom = await decryptFields(symptom, encryptedFields.symptoms, userId);
 
           if (symptom.solutions) {
             decryptedSymptom.solutions = await Promise.all(
               symptom.solutions.map(async (solution) =>
-                await decryptFields(solution, encryptedFields.solutions, userId, CryptoJS)
+                await decryptFields(solution, encryptedFields.solutions, userId)
               )
             );
           }
@@ -474,20 +472,15 @@ export const secureDataOperations = {
 
       // Filter the decrypted data based on the search term
       const searchTermLower = searchTerm.toLowerCase();
-      const filteredData = decryptedData.filter(symptom => {
+      const filteredData = decryptedData.filter((symptom: Symptom) => {
         // Search in symptom name
         if (symptom.name && symptom.name.toLowerCase().includes(searchTermLower)) {
           return true;
         }
 
-        // Search in notes
-        if (symptom.notes && symptom.notes.toLowerCase().includes(searchTermLower)) {
-          return true;
-        }
-
         // Search in solutions
         if (symptom.solutions && symptom.solutions.length > 0) {
-          return symptom.solutions.some(solution =>
+          return symptom.solutions.some((solution: Solution) =>
             solution.description && solution.description.toLowerCase().includes(searchTermLower) ||
             solution.notes && solution.notes.toLowerCase().includes(searchTermLower)
           );
