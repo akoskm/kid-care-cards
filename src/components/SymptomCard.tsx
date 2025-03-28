@@ -82,12 +82,6 @@ export default function SymptomCard({ card, onDelete, onEdit, readOnly = false, 
           </div>
         )}
 
-        {card.notes && (
-          <div className="mt-4">
-            <h4 className="font-semibold mb-2">Notes:</h4>
-            <p className="text-gray-700">{card.notes}</p>
-          </div>
-        )}
               </CardContent>
 
               {!readOnly && (
