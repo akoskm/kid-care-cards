@@ -52,7 +52,7 @@ export default function Home() {
             <div className="hidden md:flex justify-center items-center">
               <div className="relative w-full max-w-lg">
                 <Image
-                  src="/hero.jpg"
+                  src="/hero.jpeg"
                   alt="Parent using Kid Care Cards app while child sleeps"
                   width={600}
                   height={600}
