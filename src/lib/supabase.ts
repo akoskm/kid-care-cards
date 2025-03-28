@@ -46,7 +46,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 // Fields that should be encrypted in each table
 const encryptedFields = {
-  symptoms: ['name', 'description', 'notes'] as const,
+  symptoms: ['name'] as const,
   solutions: ['description', 'notes', 'time_to_relief'] as const,
   children: ['name'] as const,
 };
@@ -101,8 +101,6 @@ export const secureDataOperations = {
         .select(`
           id,
           name,
-          notes,
-          description,
           child_id,
           severity,
           age_group,
@@ -152,7 +150,6 @@ export const secureDataOperations = {
           child_id: data.child_id,
           severity: data.severity || 1,
           age_group: data.age_group || 'all',
-          notes: encryptedData.notes || null,
         })
         .eq('id', id);
 
@@ -231,8 +228,6 @@ export const secureDataOperations = {
         .select(`
           id,
           name,
-          notes,
-          description,
           child_id,
           severity,
           age_group,
@@ -293,8 +288,6 @@ export const secureDataOperations = {
         .select(`
           id,
           name,
-          notes,
-          description,
           child_id,
           severity,
           age_group,
@@ -446,8 +439,6 @@ export const secureDataOperations = {
         .select(`
           id,
           name,
-          notes,
-          description,
           child_id,
           severity,
           age_group,

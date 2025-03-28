@@ -1,26 +1,39 @@
-// Remove the import and add the type
-export type CryptoJSType = typeof import('crypto-js');
-
-// Key derivation function to generate encryption key from user's UUID
-const deriveEncryptionKey = (userId: string, CryptoJS: CryptoJSType): string => {
+// Key derivation function using Web Crypto API
+const deriveEncryptionKey = async (userId: string): Promise<CryptoKey> => {
   if (!userId) {
     throw new Error('No user ID available');
   }
 
-  // Use only the user's UUID for key derivation with a random MD5 hash as salt
-  // This is stable and doesn't change between sessions
   const salt = 'e10adc3949ba59abbe56e057f20f883e'; // MD5 hash for additional security
 
-  return CryptoJS.PBKDF2(userId, salt, {
-    keySize: 256 / 32,
-    iterations: 1000
-  }).toString();
+  // Convert userId and salt to Uint8Array
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(userId),
+    'PBKDF2',
+    false,
+    ['deriveBits', 'deriveKey']
+  );
+
+  return crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: encoder.encode(salt),
+      iterations: 1000,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt']
+  );
 };
 
-// Encrypt data with proper error handling
-export const encryptData = (data: unknown, userId: string, CryptoJS: CryptoJSType): string => {
+// Encrypt data with Web Crypto API
+export const encryptData = async (data: unknown, userId: string): Promise<string> => {
   try {
-    const key = deriveEncryptionKey(userId, CryptoJS);
+    const key = await deriveEncryptionKey(userId);
     const jsonString = JSON.stringify(data);
 
     // Add a version and timestamp to the encrypted data
@@ -30,24 +43,59 @@ export const encryptData = (data: unknown, userId: string, CryptoJS: CryptoJSTyp
       data: jsonString
     };
 
-    return CryptoJS.AES.encrypt(JSON.stringify(dataToEncrypt), key).toString();
+    // Generate a random IV
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+
+    // Encrypt the data
+    const encryptedData = await crypto.subtle.encrypt(
+      {
+        name: 'AES-GCM',
+        iv: iv
+      },
+      key,
+      new TextEncoder().encode(JSON.stringify(dataToEncrypt))
+    );
+
+    // Combine IV and encrypted data
+    const combined = new Uint8Array(iv.length + encryptedData.byteLength);
+    combined.set(iv);
+    combined.set(new Uint8Array(encryptedData), iv.length);
+
+    // Convert to base64
+    return btoa(String.fromCharCode(...combined));
   } catch (error) {
     console.error('Encryption failed:', error);
     throw new Error('Failed to encrypt data');
   }
 };
 
-// Decrypt data with proper error handling and validation
-export const decryptData = (encryptedData: string, userId: string, CryptoJS: CryptoJSType): unknown => {
+// Decrypt data using Web Crypto API
+export const decryptData = async (encryptedData: string, userId: string): Promise<unknown> => {
   try {
-    const key = deriveEncryptionKey(userId, CryptoJS);
-    const bytes = CryptoJS.AES.decrypt(encryptedData, key);
-    const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
-
-    if (!decryptedString) {
-      throw new Error('Decryption produced empty result');
+    // Decode base64
+    const decodedData = atob(encryptedData);
+    const dataArray = new Uint8Array(decodedData.length);
+    for (let i = 0; i < decodedData.length; i++) {
+      dataArray[i] = decodedData.charCodeAt(i);
     }
 
+    const key = await deriveEncryptionKey(userId);
+
+    // Extract IV (first 12 bytes) and encrypted data
+    const iv = dataArray.slice(0, 12);
+    const encryptedContent = dataArray.slice(12);
+
+    // Decrypt the data
+    const decryptedBuffer = await crypto.subtle.decrypt(
+      {
+        name: 'AES-GCM',
+        iv: iv
+      },
+      key,
+      encryptedContent
+    );
+
+    const decryptedString = new TextDecoder().decode(decryptedBuffer);
     const parsed = JSON.parse(decryptedString);
 
     // Validate the decrypted data structure
@@ -64,18 +112,17 @@ export const decryptData = (encryptedData: string, userId: string, CryptoJS: Cry
 };
 
 // Encrypt specific fields in an object
-export const encryptFields = <T extends Record<string, unknown>>(
+export const encryptFields = async <T extends Record<string, unknown>>(
   data: T,
   fieldsToEncrypt: readonly (keyof T)[],
-  userId: string,
-  CryptoJS: CryptoJSType
-): T => {
+  userId: string
+): Promise<T> => {
   try {
     const encryptedData = { ...data };
 
     for (const field of fieldsToEncrypt) {
       if (data[field] !== undefined && data[field] !== null) {
-        encryptedData[field] = encryptData(data[field], userId, CryptoJS) as T[typeof field];
+        encryptedData[field] = await encryptData(data[field], userId) as T[typeof field];
       }
     }
 
@@ -87,18 +134,17 @@ export const encryptFields = <T extends Record<string, unknown>>(
 };
 
 // Decrypt specific fields in an object
-export const decryptFields = <T extends Record<string, unknown>>(
+export const decryptFields = async <T extends Record<string, unknown>>(
   data: T,
   fieldsToDecrypt: readonly (keyof T)[],
-  userId: string,
-  CryptoJS: CryptoJSType
-): T => {
+  userId: string
+): Promise<T> => {
   try {
     const decryptedData = { ...data };
 
     for (const field of fieldsToDecrypt) {
       if (data[field] !== undefined && data[field] !== null) {
-        const decrypted = decryptData(data[field] as string, userId, CryptoJS);
+        const decrypted = await decryptData(data[field] as string, userId);
         // Only update the field if decryption was successful
         if (decrypted !== null) {
           decryptedData[field] = decrypted as T[typeof field];

@@ -18,12 +18,10 @@ interface BaseSymptom {
   child_id?: string;
   severity?: number | null;
   age_group?: string | null;
-  notes?: string | null;
 }
 
 export interface Symptom extends BaseSymptom {
   id: string;
-  description?: string | null;
   created_at: string;
   solutions?: Solution[];
 }
