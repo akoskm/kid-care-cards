@@ -17,8 +17,8 @@ const corsHeaders = {
 
 // Fields that should be encrypted in each table
 const encryptedFields = {
-  symptoms: ['name', 'notes'] as const,
-  solutions: ['description', 'time_to_relief'] as const,
+  symptoms: ['name'] as const,
+  solutions: ['description', 'time_to_relief', 'notes'] as const,
 }
 
 console.log("Hello from Functions!")
@@ -73,14 +73,14 @@ serve(async (req) => {
           "name": "symptom name",
           "severity": number (1-5),
           "age_group": "all" or specific age group,
-          "notes": "additional details"
         }
       ],
       "solutions": [
         {
           "description": "solution description",
           "effectiveness_rating": number (1-5),
-          "time_to_relief": "estimated time"
+          "time_to_relief": "estimated time",
+          "notes": "additional details"
         }
       ]
     }
@@ -116,7 +116,7 @@ serve(async (req) => {
       }
 
       // Encrypt the symptom data
-      const encryptedSymptom = encryptObjectFields(symptom, encryptedFields.symptoms, userId);
+      const encryptedSymptom = await encryptObjectFields(symptom, encryptedFields.symptoms, userId);
 
       const { data: symptomData, error: symptomError } = await supabaseClient
         .from('symptoms')
@@ -124,7 +124,6 @@ serve(async (req) => {
           name: encryptedSymptom.name,
           severity: symptom.severity,
           age_group: symptom.age_group,
-          notes: encryptedSymptom.notes,
           child_id: null,
           user_id: userId,
         })
@@ -141,15 +140,20 @@ serve(async (req) => {
         console.log("Inserting solutions for symptom:", symptom.name);
 
         // Encrypt the solutions data
-        const encryptedSolutions = extractedData.solutions.map(solution =>
-          encryptObjectFields(solution, encryptedFields.solutions, userId)
+        const encryptedSolutions = await Promise.all(
+          extractedData.solutions.map(solution =>
+            encryptObjectFields(solution, encryptedFields.solutions, userId)
+          )
         );
+
+        console.log("Encrypted solutions:", encryptedSolutions);
 
         const solutionsToInsert = encryptedSolutions.map(solution => ({
           symptom_id: symptomData.id,
           description: solution.description,
           effectiveness_rating: solution.effectiveness_rating,
           time_to_relief: solution.time_to_relief,
+          notes: solution.notes,
         }))
 
         const { error: solutionsError } = await supabaseClient
