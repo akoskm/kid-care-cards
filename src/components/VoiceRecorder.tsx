@@ -13,7 +13,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useAuth } from '@/context/AuthContext';
-import { Overlay } from '@/components/ui/overlay';
 import { useSubscription } from '@/hooks/useSubscription';
 
 interface VoiceRecorderProps {
@@ -62,7 +61,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
     fetchUsageAndSubscription();
   }, [user]);
 
-  const handleStartRecording = async () => {
+  const startRecording = async () => {
     if (!isSubscribed && !isTrialing) {
       setShowSubscriptionDialog(true);
       return;
@@ -85,7 +84,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
       mediaRecorder.current.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('Error starting recording:', error);
+      console.error('Error accessing microphone:', error);
       toast({
         title: 'Error',
         description: 'Could not access microphone. Please check your permissions.',
@@ -170,7 +169,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
     <>
       <div className="flex items-center gap-2">
         <Button
-          onClick={handleStartRecording}
+          onClick={isRecording ? stopRecording : startRecording}
           disabled={isProcessing}
           variant={isRecording ? "destructive" : "default"}
           size="icon"
@@ -186,11 +185,6 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
           )}
         </Button>
       </div>
-
-      {isRecording && (
-        <Overlay>Recording...</Overlay>
-      )}
-
       <Dialog open={isProcessing}>
         <DialogContent>
           <DialogHeader>
