@@ -36,14 +36,14 @@ export function useSubscription(): SubscriptionStatus {
           .single();
 
         if (subscription) {
-          const trialEnd = subscription.trial_ends_at ? new Date(subscription.trial_ends_at) : null;
+          const trialEnd = subscription.trial_end_date ? new Date(subscription.trial_end_date) : null;
           const now = new Date();
 
           setStatus({
             isSubscribed: subscription.status === 'active',
             isTrialing: trialEnd ? trialEnd > now : false,
             trialEndsAt: trialEnd,
-            subscriptionType: subscription.plan_type || null,
+            subscriptionType: subscription.subscription_type || null,
             loading: false,
           });
         } else {
