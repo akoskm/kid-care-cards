@@ -115,6 +115,51 @@ serve(async (req) => {
         throw new Error('User ID is required');
       }
 
+      // Check subscription status
+      const { data: subscription } = await supabaseClient
+        .from('subscriptions')
+        .select('status, trial_end_date')
+        .eq('user_id', userId)
+        .single();
+
+      // Check usage count if not subscribed or in trial
+      if (!subscription || subscription.status !== 'active') {
+        const { data: usage } = await supabaseClient
+          .from('dictation_usage')
+          .select('usage_count')
+          .eq('user_id', userId)
+          .single();
+
+        if (!usage) {
+          throw new Error('Usage record not found');
+        }
+
+        // If in trial, allow unlimited usage
+        const isInTrial = subscription?.trial_end_date && new Date(subscription.trial_end_date) > new Date();
+
+        // If not in trial and usage limit reached, return error
+        if (!isInTrial && usage.usage_count >= 3) {
+          return new Response(
+            JSON.stringify({ error: 'Usage limit exceeded. Please subscribe to continue using dictation.' }),
+            {
+              status: 403,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+
+        // Update usage count
+        const { error: updateError } = await supabaseClient
+          .from('dictation_usage')
+          .update({ usage_count: usage.usage_count + 1 })
+          .eq('user_id', userId);
+
+        if (updateError) {
+          console.error("Error updating usage count:", updateError);
+          throw updateError;
+        }
+      }
+
       // Encrypt the symptom data
       const encryptedSymptom = await encryptObjectFields(symptom, encryptedFields.symptoms, userId);
 
