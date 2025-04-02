@@ -143,7 +143,9 @@ export default function SymptomsPage() {
   return (
     <MainLayout>
       <div className="container mx-auto py-4">
-        <h1 className="text-2xl font-bold mb-4 px-4">Symptoms</h1>
+        <div className="flex items-center px-4 mb-4">
+          <h1 className="text-2xl font-bold">Symptoms</h1>
+        </div>
 
         <div className="px-4 mb-4">
           <div className="flex space-x-2">

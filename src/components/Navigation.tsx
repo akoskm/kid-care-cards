@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SignOutButton } from './SignOutButton';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { LayoutDashboard, Users } from 'lucide-react';
+import { UserMenu } from '@/components/UserMenu';
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -34,9 +34,9 @@ export default function Navigation() {
 
   return (
     <>
-      {/* Top navigation for sign-out */}
-      <div className="fixed top-0 right-0 p-4 z-10">
-        <SignOutButton />
+      {/* Top navigation for user menu */}
+      <div className="fixed top-0 right-0 p-4 z-[60]">
+        <UserMenu />
       </div>
 
       {/* Bottom navigation for page links */}

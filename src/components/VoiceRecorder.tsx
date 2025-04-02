@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, Square } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
@@ -10,7 +10,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { useAuth } from '@/context/AuthContext';
+import { Overlay } from '@/components/ui/overlay';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface VoiceRecorderProps {
   onSuccess?: () => void;
@@ -19,11 +23,51 @@ interface VoiceRecorderProps {
 export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
+  const [usageCount, setUsageCount] = useState(0);
+  const [hasSubscription, setHasSubscription] = useState(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { isSubscribed, isTrialing } = useSubscription();
 
-  const startRecording = async () => {
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchUsageAndSubscription = async () => {
+      // Fetch usage count
+      const { data: usage } = await supabase
+        .from('dictation_usage')
+        .select('usage_count')
+        .eq('user_id', user.id)
+        .single();
+
+      if (usage) {
+        setUsageCount(usage.usage_count);
+      }
+
+      // Fetch subscription status
+      const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', user.id)
+        .single();
+
+      if (subscription?.status === 'active') {
+        setHasSubscription(true);
+      }
+    };
+
+    fetchUsageAndSubscription();
+  }, [user]);
+
+  const handleStartRecording = async () => {
+    if (!isSubscribed && !isTrialing) {
+      setShowSubscriptionDialog(true);
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder.current = new MediaRecorder(stream);
@@ -41,7 +85,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
       mediaRecorder.current.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('Error accessing microphone:', error);
+      console.error('Error starting recording:', error);
       toast({
         title: 'Error',
         description: 'Could not access microphone. Please check your permissions.',
@@ -91,6 +135,17 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
       if (error) throw error;
 
       if (data && data.success) {
+        // Update usage count if not subscribed
+        if (!hasSubscription) {
+          const { error: updateError } = await supabase
+            .from('dictation_usage')
+            .update({ usage_count: usageCount + 1 })
+            .eq('user_id', session.user.id);
+
+          if (updateError) throw updateError;
+          setUsageCount(prev => prev + 1);
+        }
+
         toast({
           title: 'Success',
           description: 'Voice recording processed successfully!',
@@ -115,7 +170,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
     <>
       <div className="flex items-center gap-2">
         <Button
-          onClick={isRecording ? stopRecording : startRecording}
+          onClick={handleStartRecording}
           disabled={isProcessing}
           variant={isRecording ? "destructive" : "default"}
           size="icon"
@@ -131,6 +186,11 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
           )}
         </Button>
       </div>
+
+      {isRecording && (
+        <Overlay>Recording...</Overlay>
+      )}
+
       <Dialog open={isProcessing}>
         <DialogContent>
           <DialogHeader>
@@ -142,6 +202,25 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
               Please wait while we process your voice recording. This may take a few moments.
             </DialogDescription>
           </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Subscription Required</DialogTitle>
+            <DialogDescription>
+              The dictation feature requires a subscription. Subscribe now to unlock unlimited dictation.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSubscriptionDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => window.location.href = '/settings'}>
+              View Plans
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

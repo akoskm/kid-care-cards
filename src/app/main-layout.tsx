@@ -1,16 +1,24 @@
-import React from 'react';
+"use client";
+
+import { useAuth } from '@/context/AuthContext';
+import { TrialBanner } from '@/components/TrialBanner';
 import Navigation from '@/components/Navigation';
 
-export default function MainLayout({
-  children,
-}: {
+interface MainLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function MainLayout({ children }: MainLayoutProps) {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <>{children}</>;
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1">
-        {children}
-      </main>
+    <div className="min-h-screen bg-background">
+      <TrialBanner />
+      <main>{children}</main>
       <Navigation />
     </div>
   );
