@@ -8,10 +8,12 @@ import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { LayoutDashboard, Users } from 'lucide-react';
 import { UserMenu } from '@/components/UserMenu';
+import {useSubscription} from '@/hooks/useSubscription';
 
 export default function Navigation() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
+  const { isSubscribed } = useSubscription();
 
   useEffect(() => {
     // Get initial session
@@ -35,7 +37,7 @@ export default function Navigation() {
   return (
     <>
       {/* Top navigation for user menu */}
-      <div className="fixed top-0 right-0 p-4 z-[60]">
+      <div className={`fixed p-4 right-0 ${isSubscribed ? 'top-0' : 'top-8'} z-[60]`}>
         <UserMenu />
       </div>
 
