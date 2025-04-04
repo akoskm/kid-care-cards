@@ -1,9 +1,8 @@
-import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
+import { supabase } from '@/lib/supabase';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2025-03-31.basil',
 });
 
 export async function POST(req: Request) {
@@ -11,7 +10,6 @@ export async function POST(req: Request) {
     const { priceId } = await req.json();
 
     // Get the user from the session
-    const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session?.user) {

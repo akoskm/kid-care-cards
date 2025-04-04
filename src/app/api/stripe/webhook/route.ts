@@ -1,16 +1,16 @@
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2025-03-31.basil',
 });
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const signature = headers().get('stripe-signature')!;
+  const signature = (await headers()).get('stripe-signature')!;
 
   let event: Stripe.Event;
 
@@ -19,8 +19,6 @@ export async function POST(req: Request) {
   } catch (err) {
     return new Response(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown error'}`, { status: 400 });
   }
-
-  const supabase = createClient();
 
   switch (event.type) {
     case 'customer.subscription.created':
