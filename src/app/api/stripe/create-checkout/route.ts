@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import Stripe from 'stripe';
+import { headers } from 'next/headers';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-03-31.basil',
@@ -7,29 +8,38 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const { priceId } = await req.json();
+    const headersList = await headers();
+    const authorization = headersList.get('authorization');
 
-    // Get the user from the session
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (!session?.user) {
+    if (!authorization) {
       return new Response('Unauthorized', { status: 401 });
     }
+
+    const token = authorization.replace('Bearer ', '');
+
+    // Verify the session token
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+
+    if (userError || !user) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
+    const { priceId } = await req.json();
 
     // Create or retrieve Stripe customer
     const { data: subscriptionData } = await supabase
       .from('subscriptions')
       .select('stripe_customer_id')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     let customerId = subscriptionData?.stripe_customer_id;
 
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: session.user.email,
+        email: user.email,
         metadata: {
-          userId: session.user.id
+          userId: user.id
         }
       });
       customerId = customer.id;
@@ -38,7 +48,7 @@ export async function POST(req: Request) {
       await supabase
         .from('subscriptions')
         .update({ stripe_customer_id: customerId })
-        .eq('user_id', session.user.id);
+        .eq('user_id', user.id);
     }
 
     // Create checkout session
@@ -55,7 +65,7 @@ export async function POST(req: Request) {
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings?canceled=true`,
       subscription_data: {
         metadata: {
-          userId: session.user.id
+          userId: user.id
         }
       }
     });

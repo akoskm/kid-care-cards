@@ -1,24 +1,61 @@
 "use client";
 
 import { useSubscription } from '@/hooks/useSubscription';
+import { useAuth } from '@/context/AuthContext';
 import MainLayout from '../main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDistanceToNow } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 export default function SettingsPage() {
   const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading } = useSubscription();
+  const { user, session, loading: authLoading } = useAuth();
+  const router = useRouter();
 
   const handleSubscribe = async (priceId: string) => {
-    const response = await fetch('/api/stripe/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ priceId })
-    });
+    if (!user || !session) {
+      router.push('/login');
+      return;
+    }
 
-    const { url } = await response.json();
-    window.location.href = url;
+    try {
+      const response = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ priceId })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+    }
   };
+
+  if (authLoading) {
+    return (
+      <MainLayout>
+        <div className="container mx-auto py-4">
+          <div className="flex items-center justify-center">
+            <p>Loading...</p>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (!user) {
+    router.push('/login');
+    return null;
+  }
 
   return (
     <MainLayout>
