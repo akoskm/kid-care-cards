@@ -24,6 +24,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const [usageCount, setUsageCount] = useState(0);
+  const [usageLimit, setUsageLimit] = useState(10);
   const [hasSubscription, setHasSubscription] = useState(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
@@ -35,15 +36,16 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
     if (!user) return;
 
     const fetchUsageAndSubscription = async () => {
-      // Fetch usage count
+      // Fetch usage count and limit
       const { data: usage } = await supabase
         .from('dictation_usage')
-        .select('usage_count')
+        .select('usage_count, usage_limit')
         .eq('user_id', user.id)
         .single();
 
       if (usage) {
         setUsageCount(usage.usage_count);
+        setUsageLimit(usage.usage_limit);
       }
 
       // Fetch subscription status
@@ -68,7 +70,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
     }
 
     // Check usage limit for non-subscribed users
-    if (!isSubscribed && usageCount >= 3) {
+    if (!isSubscribed && usageCount >= usageLimit) {
       setShowSubscriptionDialog(true);
       return;
     }

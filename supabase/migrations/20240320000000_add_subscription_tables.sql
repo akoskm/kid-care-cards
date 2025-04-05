@@ -3,6 +3,7 @@ create table dictation_usage (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references auth.users(id) not null,
   usage_count integer default 0,
+  usage_limit integer default 10,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
   unique(user_id)

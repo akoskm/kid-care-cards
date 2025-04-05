@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { formatDistanceToNow } from 'date-fns';
 
 export default function SettingsPage() {
-  const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading, dictationUsage } = useSubscription();
+  const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading, dictationUsage, dictationUsageLimit } = useSubscription();
   const { session, loading: authLoading } = useAuth();
 
   const handleSubscribe = async (priceId: string) => {
@@ -79,7 +79,7 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle>Dictation Usage</CardTitle>
                 <CardDescription>
-                  You have used {dictationUsage} out of 3 dictations in your trial period
+                  You have used {dictationUsage} out of {dictationUsageLimit} dictations in your trial period
                 </CardDescription>
               </CardHeader>
             </Card>

@@ -55,7 +55,7 @@ serve(async (req) => {
     if (!subscription || subscription.status !== 'active') {
       const { data: usage } = await supabaseClient
         .from('dictation_usage')
-        .select('usage_count')
+        .select('usage_count, usage_limit')
         .eq('user_id', userId)
         .single();
 
@@ -64,7 +64,7 @@ serve(async (req) => {
       }
 
       // If usage limit reached, return error
-      if (usage.usage_count >= 3) {
+      if (usage.usage_count >= usage.usage_limit) {
         return new Response(
           JSON.stringify({ error: 'Usage limit exceeded. Please subscribe to continue using dictation.' }),
           {
