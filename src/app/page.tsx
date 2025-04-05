@@ -16,13 +16,13 @@ export default function Home() {
               <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</a>
             </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/sign-in" className="text-emerald-600 hover:text-emerald-700">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Link href="/sign-in" className="text-emerald-600 hover:text-emerald-700 whitespace-nowrap text-sm sm:text-base">
                 Log in
               </Link>
               <Link
                 href="/sign-up"
-                className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+                className="bg-emerald-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-emerald-700 text-sm sm:text-base whitespace-nowrap"
               >
                 Request Demo
               </Link>
@@ -49,14 +49,14 @@ export default function Home() {
                 Get Started
               </Link>
             </div>
-            <div className="hidden md:flex justify-center items-center">
+            <div className="flex justify-center items-center">
               <div className="relative w-full max-w-lg">
                 <Image
                   src="/hero.jpeg"
                   alt="Parent using Kid Care Cards app while child sleeps"
                   width={600}
                   height={600}
-                  className="rounded-lg shadow-lg"
+                  className="rounded-lg shadow-lg w-full h-auto md:h-[600px]"
                   style={{ objectFit: 'cover' }}
                   priority
                 />
@@ -124,7 +124,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Secure Data</h3>
                 <p className="text-gray-600">
-                  Your child&apos;s health information is protected with enterprise-grade security.
+                  Your child&apos;s health information is encrypted and stored securely on our servers.
                 </p>
               </div>
             </div>
