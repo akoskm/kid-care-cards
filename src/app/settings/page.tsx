@@ -9,7 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useRouter } from 'next/navigation';
 
 export default function SettingsPage() {
-  const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading } = useSubscription();
+  const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading, dictationUsage } = useSubscription();
   const { user, session, loading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -81,6 +81,17 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
           </Card>
+
+          {isTrialing && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Dictation Usage</CardTitle>
+                <CardDescription>
+                  You have used {dictationUsage} out of 3 dictations in your trial period
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )}
 
           {!isSubscribed && (
             <div className="grid gap-6 md:grid-cols-2">

@@ -8,6 +8,7 @@ interface SubscriptionStatus {
   trialEndsAt: Date | null;
   subscriptionType: 'monthly' | 'annual' | null;
   loading: boolean;
+  dictationUsage: number;
 }
 
 export function useSubscription(): SubscriptionStatus {
@@ -17,6 +18,7 @@ export function useSubscription(): SubscriptionStatus {
     trialEndsAt: null,
     subscriptionType: null,
     loading: true,
+    dictationUsage: 0,
   });
 
   const { user } = useAuth();
@@ -29,9 +31,17 @@ export function useSubscription(): SubscriptionStatus {
 
     const fetchSubscriptionStatus = async () => {
       try {
+        // Fetch subscription status
         const { data: subscription } = await supabase
           .from('subscriptions')
           .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        // Fetch dictation usage
+        const { data: usage } = await supabase
+          .from('dictation_usage')
+          .select('usage_count')
           .eq('user_id', user.id)
           .single();
 
@@ -45,6 +55,7 @@ export function useSubscription(): SubscriptionStatus {
             trialEndsAt: trialEnd,
             subscriptionType: subscription.subscription_type || null,
             loading: false,
+            dictationUsage: usage?.usage_count || 0,
           });
         } else {
           setStatus({
@@ -53,6 +64,7 @@ export function useSubscription(): SubscriptionStatus {
             trialEndsAt: null,
             subscriptionType: null,
             loading: false,
+            dictationUsage: usage?.usage_count || 0,
           });
         }
       } catch (error) {
