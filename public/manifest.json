@@ -4,6 +4,5 @@
   "description": "Track your child's symptoms and solutions",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#6366f1"
+  "background_color": "#ffffff"
 }
