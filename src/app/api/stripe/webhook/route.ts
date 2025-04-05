@@ -14,11 +14,15 @@ export async function POST(req: Request) {
 
   let event: Stripe.Event;
 
+  console.log('Stripe webhook received!');
+
   try {
     event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
   } catch (err) {
     return new Response(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown error'}`, { status: 400 });
   }
+
+  console.log('Event:', event.type);
 
   switch (event.type) {
     case 'customer.subscription.created':
@@ -31,6 +35,8 @@ export async function POST(req: Request) {
 
       // Determine subscription type based on price ID
       const subscriptionType = priceId === process.env.STRIPE_MONTHLY_PRICE_ID ? 'monthly' : 'annual';
+
+      console.log('Subscription:', subscription);
 
       // Update subscription in database
       const { error } = await supabase
@@ -48,6 +54,8 @@ export async function POST(req: Request) {
         console.error('Error updating subscription:', error);
         return new Response('Error updating subscription', { status: 500 });
       }
+
+      console.log('Subscription updated successfully');
       break;
     }
 
@@ -64,10 +72,13 @@ export async function POST(req: Request) {
         })
         .eq('stripe_subscription_id', subscriptionId);
 
+
       if (error) {
         console.error('Error updating subscription:', error);
         return new Response('Error updating subscription', { status: 500 });
       }
+
+      console.log('Subscription updated successfully');
       break;
     }
   }
