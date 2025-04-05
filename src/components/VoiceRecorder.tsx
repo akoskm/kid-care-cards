@@ -67,6 +67,12 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
       return;
     }
 
+    // Check usage limit for non-subscribed users
+    if (!isSubscribed && usageCount >= 3) {
+      setShowSubscriptionDialog(true);
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder.current = new MediaRecorder(stream);
@@ -131,9 +137,11 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        setShowSubscriptionDialog(true);
+      }
 
-      if (data && data.success) {
+      if (data?.success) {
         // Update usage count if not subscribed
         if (!hasSubscription) {
           const { error: updateError } = await supabase
@@ -157,8 +165,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
       console.error('Error processing audio:', error);
       toast({
         title: 'Error',
-        description: 'Failed to process voice recording. Please try again.',
-        variant: 'destructive',
+        description: error instanceof Error ? error.message : 'Failed to process voice recording. Please try again.',
       });
     } finally {
       setIsProcessing(false);
