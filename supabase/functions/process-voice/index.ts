@@ -32,6 +32,60 @@ serve(async (req) => {
   try {
     console.log("Received request");
 
+    // Get the user ID from the request headers
+    const userId = req.headers.get('x-user-id');
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
+    // Initialize Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // Check subscription status
+    const { data: subscription } = await supabaseClient
+      .from('subscriptions')
+      .select('status, trial_end_date')
+      .eq('user_id', userId)
+      .single();
+
+    // Check usage count if not subscribed
+    if (!subscription || subscription.status !== 'active') {
+      const { data: usage } = await supabaseClient
+        .from('dictation_usage')
+        .select('usage_count')
+        .eq('user_id', userId)
+        .single();
+
+      if (!usage) {
+        throw new Error('Usage record not found');
+      }
+
+      // If usage limit reached, return error
+      if (usage.usage_count >= 3) {
+        return new Response(
+          JSON.stringify({ error: 'Usage limit exceeded. Please subscribe to continue using dictation.' }),
+          {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+
+      // Update usage count
+      const { error: updateError } = await supabaseClient
+        .from('dictation_usage')
+        .update({ usage_count: usage.usage_count + 1 })
+        .eq('user_id', userId);
+
+      if (updateError) {
+        console.error("Error updating usage count:", updateError);
+        throw updateError;
+      }
+    }
+
     // Get the audio data from the request
     const body = await req.json();
     console.log("Request body received:", { hasAudio: !!body.audio, bodyKeys: Object.keys(body) });
@@ -99,66 +153,9 @@ serve(async (req) => {
     const extractedData = JSON.parse(completion.choices[0].message?.content || '{}')
     console.log("Extracted data:", JSON.stringify(extractedData, null, 2));
 
-    // Initialize Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
-
     // Insert symptoms and solutions into the database
     for (const symptom of extractedData.symptoms) {
       console.log("Inserting symptom:", symptom.name);
-
-      // Get the user ID from the request headers
-      const userId = req.headers.get('x-user-id');
-      if (!userId) {
-        throw new Error('User ID is required');
-      }
-
-      // Check subscription status
-      const { data: subscription } = await supabaseClient
-        .from('subscriptions')
-        .select('status, trial_end_date')
-        .eq('user_id', userId)
-        .single();
-
-      // Check usage count if not subscribed or in trial
-      if (!subscription || subscription.status !== 'active') {
-        const { data: usage } = await supabaseClient
-          .from('dictation_usage')
-          .select('usage_count')
-          .eq('user_id', userId)
-          .single();
-
-        if (!usage) {
-          throw new Error('Usage record not found');
-        }
-
-        // If in trial, allow unlimited usage
-        const isInTrial = subscription?.trial_end_date && new Date(subscription.trial_end_date) > new Date();
-
-        // If not in trial and usage limit reached, return error
-        if (!isInTrial && usage.usage_count >= 3) {
-          return new Response(
-            JSON.stringify({ error: 'Usage limit exceeded. Please subscribe to continue using dictation.' }),
-            {
-              status: 403,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            }
-          );
-        }
-
-        // Update usage count
-        const { error: updateError } = await supabaseClient
-          .from('dictation_usage')
-          .update({ usage_count: usage.usage_count + 1 })
-          .eq('user_id', userId);
-
-        if (updateError) {
-          console.error("Error updating usage count:", updateError);
-          throw updateError;
-        }
-      }
 
       // Encrypt the symptom data
       const encryptedSymptom = await encryptObjectFields(symptom, encryptedFields.symptoms, userId);
@@ -180,7 +177,6 @@ serve(async (req) => {
         throw symptomError;
       }
 
-      // Insert solutions for this symptom
       if (extractedData.solutions && symptomData) {
         console.log("Inserting solutions for symptom:", symptom.name);
 
