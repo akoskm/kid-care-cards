@@ -6,16 +6,13 @@ import MainLayout from '../main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDistanceToNow } from 'date-fns';
-import { useRouter } from 'next/navigation';
 
 export default function SettingsPage() {
   const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading, dictationUsage } = useSubscription();
-  const { user, session, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { session, loading: authLoading } = useAuth();
 
   const handleSubscribe = async (priceId: string) => {
-    if (!user || !session) {
-      router.push('/login');
+    if (!session) {
       return;
     }
 
@@ -50,11 +47,6 @@ export default function SettingsPage() {
         </div>
       </MainLayout>
     );
-  }
-
-  if (!user) {
-    router.push('/login');
-    return null;
   }
 
   return (
