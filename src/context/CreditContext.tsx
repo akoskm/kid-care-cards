@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '@/lib/supabase';
 
@@ -21,36 +21,35 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { session } = useAuth();
 
-  const fetchCredits = async () => {
-    if (!session?.access_token) {
+  const fetchCredits = useCallback(async () => {
+    if (!session?.user?.id) {
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      const response = await fetch('/api/credits', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      const { data: creditData, error } = await supabase
+        .from('credits')
+        .select('credits')
+        .eq('user_id', session.user.id)
+        .single();
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch credits');
+      if (error) {
+        throw error;
       }
 
-      const data = await response.json();
-      setCredits(data.credits);
+      setCredits(creditData?.credits || 0);
     } catch (error) {
       console.error('Error fetching credits:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.user?.id]);
 
   useEffect(() => {
     fetchCredits();
-  }, [session?.access_token]);
+  }, [session?.user?.id, fetchCredits]);
 
   return (
     <CreditContext.Provider value={{ credits, loading, fetchCredits }}>

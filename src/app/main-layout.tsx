@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
-import { TrialBanner } from '@/components/TrialBanner';
 import Navigation from '@/components/Navigation';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';

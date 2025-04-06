@@ -8,12 +8,10 @@ import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { LayoutDashboard, Users } from 'lucide-react';
 import { UserMenu } from '@/components/UserMenu';
-import { useSubscription } from '@/context/SubscriptionContext';
 
 export default function Navigation() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
-  const { isSubscribed } = useSubscription();
 
   useEffect(() => {
     // Get initial session
