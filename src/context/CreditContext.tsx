@@ -7,52 +7,53 @@ import { supabase } from '@/lib/supabase';
 interface CreditStatus {
   credits: number;
   loading: boolean;
+  fetchCredits: () => Promise<void>;
 }
 
 const CreditContext = createContext<CreditStatus>({
   credits: 0,
   loading: true,
+  fetchCredits: async () => {},
 });
 
 export function CreditProvider({ children }: { children: React.ReactNode }) {
-  const [status, setStatus] = useState<CreditStatus>({
-    credits: 0,
-    loading: true,
-  });
+  const [credits, setCredits] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const { session } = useAuth();
 
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (!user) {
-      setStatus(prev => ({ ...prev, loading: false }));
+  const fetchCredits = async () => {
+    if (!session?.access_token) {
+      setLoading(false);
       return;
     }
 
-    const fetchCredits = async () => {
-      try {
-        setStatus(prev => ({ ...prev, loading: true }));
+    try {
+      setLoading(true);
+      const response = await fetch('/api/credits', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
 
-        const { data: creditData } = await supabase
-          .from('credits')
-          .select('credits')
-          .eq('user_id', user.id)
-          .single();
-
-        setStatus({
-          credits: creditData?.credits || 0,
-          loading: false,
-        });
-      } catch (error) {
-        console.error('Error fetching credits:', error);
-        setStatus(prev => ({ ...prev, loading: false }));
+      if (!response.ok) {
+        throw new Error('Failed to fetch credits');
       }
-    };
 
+      const data = await response.json();
+      setCredits(data.credits);
+    } catch (error) {
+      console.error('Error fetching credits:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchCredits();
-  }, [user?.id]);
+  }, [session?.access_token]);
 
   return (
-    <CreditContext.Provider value={status}>
+    <CreditContext.Provider value={{ credits, loading, fetchCredits }}>
       {children}
     </CreditContext.Provider>
   );

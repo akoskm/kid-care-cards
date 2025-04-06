@@ -25,7 +25,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const { toast } = useToast();
-  const { credits } = useCredits();
+  const { credits, fetchCredits } = useCredits();
 
   const startRecording = async () => {
     if (credits <= 0) {
@@ -109,6 +109,8 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
       } else {
         throw new Error('Failed to process voice recording');
       }
+      // Refetch credits after successful processing
+      await fetchCredits();
     } catch (error) {
       console.error('Error processing audio:', error);
       toast({
