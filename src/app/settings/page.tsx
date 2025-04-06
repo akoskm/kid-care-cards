@@ -1,52 +1,49 @@
 "use client";
 
-import { useSubscription } from '@/context/SubscriptionContext';
 import { useAuth } from '@/context/AuthContext';
 import MainLayout from '../main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatDistanceToNow } from 'date-fns';
 import { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
-  const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading: subscriptionLoading, dictationUsage, dictationUsageLimit } = useSubscription();
   const { session, loading: authLoading } = useAuth();
-  const [subscriptionEndsAt, setSubscriptionEndsAt] = useState<string | null>(null);
-  const [stripeLoading, setStripeLoading] = useState(false);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSubscriptionStatus = async () => {
-      if (!session || !isSubscribed) return;
+    const fetchCredits = async () => {
+      if (!session) return;
 
       try {
-        setStripeLoading(true);
-        const response = await fetch('/api/stripe/subscription-status', {
+        setLoading(true);
+        const response = await fetch('/api/credits', {
           headers: {
             'Authorization': `Bearer ${session.access_token}`
           }
         });
 
         if (response.ok) {
-          const { subscriptionEndsAt } = await response.json();
-          setSubscriptionEndsAt(subscriptionEndsAt);
+          const { credits } = await response.json();
+          setCredits(credits);
         }
       } catch (error) {
-        console.error('Error fetching subscription status:', error);
+        console.error('Error fetching credits:', error);
       } finally {
-        setStripeLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchSubscriptionStatus();
-  }, [session, isSubscribed]);
+    fetchCredits();
+  }, [session]);
 
-  const handleSubscribe = async (priceId: string) => {
+  const handlePurchaseCredits = async (priceId: string) => {
     if (!session) {
       return;
     }
 
     try {
-      const response = await fetch('/api/stripe/create-checkout', {
+      const response = await fetch('/api/stripe/create-credit-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,28 +60,6 @@ export default function SettingsPage() {
       window.location.href = url;
     } catch (error) {
       console.error('Error creating checkout session:', error);
-    }
-  };
-
-  const handleManageSubscription = async () => {
-    if (!session) return;
-    try {
-      const response = await fetch('/api/stripe/create-portal', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create portal session');
-      }
-
-      const { url } = await response.json();
-      window.location.href = url;
-    } catch (error) {
-      console.error('Error creating portal session:', error);
     }
   };
 
@@ -110,85 +85,61 @@ export default function SettingsPage() {
         <div className="px-4 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Subscription Status</CardTitle>
-              {subscriptionLoading || stripeLoading || !subscriptionType ? (
+              <CardTitle>Your Credits</CardTitle>
+              {loading ? (
                 <div className="space-y-2">
                   <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
                 </div>
               ) : (
                 <CardDescription>
-                  {isSubscribed ? (
-                    subscriptionEndsAt ?
-                    `Your ${subscriptionType} plan will end on ${new Date(subscriptionEndsAt).toLocaleDateString()}` :
-                    `You are currently on the ${subscriptionType} plan`
-                  ) : isTrialing ? (
-                    `Trial ends in ${formatDistanceToNow(trialEndsAt!)}`
-                  ) : (
-                    'Your trial has ended'
-                  )}
+                  You have {credits} credits remaining
                 </CardDescription>
               )}
             </CardHeader>
-            {isSubscribed && (
-              <CardContent>
-                <Button
-                  className="w-full"
-                  onClick={handleManageSubscription}
-                >
-                  Manage Subscription
-                </Button>
-              </CardContent>
-            )}
           </Card>
 
-          {isTrialing && !isSubscribed && !subscriptionEndsAt && (
+          <div className="grid gap-6 md:grid-cols-3">
             <Card>
               <CardHeader>
-                <CardTitle>Dictation Usage</CardTitle>
-                <CardDescription>
-                  You have used {dictationUsage} out of {dictationUsageLimit} dictations in your trial period
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          )}
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className={subscriptionType === 'monthly' ? 'ring-2 ring-primary' : ''}>
-              <CardHeader>
-                <CardTitle>Monthly</CardTitle>
-                <CardDescription>$5 per month</CardDescription>
+                <CardTitle>100 Credits</CardTitle>
+                <CardDescription>$5</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button
                   className="w-full"
-                  onClick={() => handleSubscribe(process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID!)}
-                  disabled={subscriptionType === 'monthly'}
+                  onClick={() => handlePurchaseCredits(process.env.NEXT_PUBLIC_STRIPE_SMALL_CREDITS_PRICE_ID!)}
                 >
-                  {subscriptionType === 'monthly'
-                    ? 'Current Plan'
-                    : isSubscribed
-                    ? 'Switch to Monthly'
-                    : 'Subscribe Monthly'}
+                  Purchase
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className={subscriptionType === 'annual' ? 'ring-2 ring-primary' : ''}>
+            <Card>
               <CardHeader>
-                <CardTitle>Annual</CardTitle>
-                <CardDescription>$50 per year (save $10)</CardDescription>
+                <CardTitle>250 Credits</CardTitle>
+                <CardDescription>$10</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button
                   className="w-full"
-                  onClick={() => handleSubscribe(process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID!)}
-                  disabled={subscriptionType === 'annual'}
+                  onClick={() => handlePurchaseCredits(process.env.NEXT_PUBLIC_STRIPE_MEDIUM_CREDITS_PRICE_ID!)}
                 >
-                  {subscriptionType === 'annual'
-                    ? 'Current Plan'
-                    : isSubscribed
-                    ? 'Switch to Annual'
-                    : 'Subscribe Annually'}
+                  Purchase
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>700 Credits</CardTitle>
+                <CardDescription>$25</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  className="w-full"
+                  onClick={() => handlePurchaseCredits(process.env.NEXT_PUBLIC_STRIPE_LARGE_CREDITS_PRICE_ID!)}
+                >
+                  Purchase
                 </Button>
               </CardContent>
             </Card>

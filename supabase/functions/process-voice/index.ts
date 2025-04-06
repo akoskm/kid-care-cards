@@ -44,46 +44,21 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Check subscription status
-    const { data: subscription } = await supabaseClient
-      .from('subscriptions')
-      .select('status, trial_end_date')
+    // Check credit balance
+    const { data: creditData } = await supabaseClient
+      .from('credits')
+      .select('credits')
       .eq('user_id', userId)
       .single();
 
-    // Check usage count if not subscribed
-    if (!subscription || subscription.status !== 'active') {
-      const { data: usage } = await supabaseClient
-        .from('dictation_usage')
-        .select('usage_count, usage_limit')
-        .eq('user_id', userId)
-        .single();
-
-      if (!usage) {
-        throw new Error('Usage record not found');
-      }
-
-      // If usage limit reached, return error
-      if (usage.usage_count >= usage.usage_limit) {
-        return new Response(
-          JSON.stringify({ error: 'Usage limit exceeded. Please subscribe to continue using dictation.' }),
-          {
-            status: 403,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      }
-
-      // Update usage count
-      const { error: updateError } = await supabaseClient
-        .from('dictation_usage')
-        .update({ usage_count: usage.usage_count + 1 })
-        .eq('user_id', userId);
-
-      if (updateError) {
-        console.error("Error updating usage count:", updateError);
-        throw updateError;
-      }
+    if (!creditData || creditData.credits <= 0) {
+      return new Response(
+        JSON.stringify({ error: 'Insufficient credits. Please purchase more credits to continue using dictation.' }),
+        {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Get the audio data from the request
@@ -206,6 +181,16 @@ serve(async (req) => {
           throw solutionsError;
         }
       }
+    }
+
+    // Decrement credits only after successful processing
+    const { error: updateError } = await supabaseClient.rpc('decrement_credits', {
+      p_user_id: userId
+    });
+
+    if (updateError) {
+      console.error("Error decrementing credits:", updateError);
+      throw updateError;
     }
 
     console.log("Successfully processed voice recording");

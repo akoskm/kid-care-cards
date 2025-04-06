@@ -12,7 +12,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useSubscription } from '@/context/SubscriptionContext';
+import { useCredits } from '@/context/CreditContext';
 
 interface VoiceRecorderProps {
   onSuccess?: () => void;
@@ -25,16 +25,10 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const { toast } = useToast();
-  const { isSubscribed, isTrialing, dictationUsage, dictationUsageLimit, incrementDictationUsage } = useSubscription();
+  const { credits } = useCredits();
 
   const startRecording = async () => {
-    if (!isSubscribed && !isTrialing) {
-      setShowSubscriptionDialog(true);
-      return;
-    }
-
-    // Check usage limit for non-subscribed users
-    if (!isSubscribed && dictationUsage >= dictationUsageLimit) {
+    if (credits <= 0) {
       setShowSubscriptionDialog(true);
       return;
     }
@@ -74,12 +68,11 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   };
 
   const processAudio = async (audioBlob: Blob) => {
+    setIsProcessing(true);
     try {
-      setIsProcessing(true);
-
       // Get the current user's ID
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.id) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
         throw new Error('You must be logged in to use voice recording');
       }
 
@@ -99,20 +92,15 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
       const { data, error } = await supabase.functions.invoke('process-voice', {
         body: { audio: base64Audio },
         headers: {
-          'x-user-id': session.user.id,
+          'x-user-id': user.id,
         },
       });
 
       if (error) {
-        setShowSubscriptionDialog(true);
+        throw new Error(error.message);
       }
 
       if (data?.success) {
-        // Update usage count if not subscribed
-        if (!isSubscribed) {
-          await incrementDictationUsage();
-        }
-
         toast({
           title: 'Success',
           description: 'Voice recording processed successfully!',
@@ -169,17 +157,17 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
       <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Subscription Required</DialogTitle>
+            <DialogTitle>Insufficient Credits</DialogTitle>
             <DialogDescription>
-              The dictation feature requires a subscription. Subscribe now to unlock unlimited dictation.
+              You need more credits to use the dictation feature. Each dictation costs 1 credit.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowSubscriptionDialog(false)}>
+            <Button onClick={() => setShowSubscriptionDialog(false)} variant="outline">
               Cancel
             </Button>
             <Button onClick={() => window.location.href = '/settings'}>
-              View Plans
+              Purchase Credits
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -34,7 +34,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <TrialBanner />
       <main>{children}</main>
       <Navigation />
     </div>

@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "@/styles/global.css";
 import { AuthProvider } from "@/context/AuthContext";
-import { SubscriptionProvider } from "@/context/SubscriptionContext";
+import { CreditProvider } from "@/context/CreditContext";
 import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
@@ -36,9 +36,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <head>
@@ -53,11 +53,11 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          <SubscriptionProvider>
+          <CreditProvider>
             {children}
-          </SubscriptionProvider>
+            <Toaster />
+          </CreditProvider>
         </AuthProvider>
-        <Toaster />
       </body>
     </html>
   );

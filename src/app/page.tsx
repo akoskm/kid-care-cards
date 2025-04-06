@@ -135,21 +135,20 @@ export default function Home() {
         <div id="pricing" className="bg-emerald-500 py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-center text-white mb-4">
-              Try Kid Care Cards free for 14 days
+              Get started with 5 free credits
             </h2>
             <p className="text-center text-white text-lg mb-12">
-              If you are not satisfied with your experience, cancel at any time. There are no contracts.
+              Purchase additional credits whenever you need them. No subscription required.
             </p>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {/* Monthly Plan */}
+            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              {/* 10 Credits */}
               <div className="bg-white rounded-lg p-8 shadow-lg">
                 <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
-                  MONTHLY PLAN
+                  10 CREDITS
                 </div>
                 <div className="flex items-baseline mb-8">
                   <span className="text-5xl font-bold">$5</span>
-                  <span className="text-gray-600 ml-2">/mo</span>
                 </div>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center text-gray-600">
@@ -168,7 +167,7 @@ export default function Home() {
                     <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Cancel anytime
+                    Buy only what you need
                   </li>
                 </ul>
                 <Link
@@ -179,21 +178,25 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Yearly Plan */}
-              <div className="bg-white rounded-lg p-8 shadow-lg">
+              {/* 25 Credits */}
+              <div className="bg-white rounded-lg p-8 shadow-lg border-4 border-indigo-500 relative">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-indigo-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                    BEST VALUE
+                  </span>
+                </div>
                 <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
-                  YEARLY PLAN
+                  25 CREDITS
                 </div>
                 <div className="flex items-baseline mb-8">
-                  <span className="text-5xl font-bold">$50</span>
-                  <span className="text-gray-600 ml-2">/year</span>
+                  <span className="text-5xl font-bold">$10</span>
                 </div>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center text-gray-600">
                     <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Save $10 annually
+                    Save $2.50
                   </li>
                   <li className="flex items-center text-gray-600">
                     <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,7 +208,7 @@ export default function Home() {
                     <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Cancel anytime
+                    Best value
                   </li>
                 </ul>
                 <Link
@@ -215,15 +218,42 @@ export default function Home() {
                   Get started
                 </Link>
               </div>
-            </div>
 
-            <div className="text-center mt-12">
-              <Link
-                href="/sign-up"
-                className="inline-block bg-white text-emerald-600 px-8 py-3 rounded-lg hover:bg-emerald-50 transition-colors"
-              >
-                Request demo
-              </Link>
+              {/* 50 Credits */}
+              <div className="bg-white rounded-lg p-8 shadow-lg">
+                <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                  50 CREDITS
+                </div>
+                <div className="flex items-baseline mb-8">
+                  <span className="text-5xl font-bold">$20</span>
+                </div>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save $5
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    All features included
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Perfect for frequent use
+                  </li>
+                </ul>
+                <Link
+                  href="/sign-up"
+                  className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
+                >
+                  Get started
+                </Link>
+              </div>
             </div>
           </div>
         </div>

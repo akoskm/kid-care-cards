@@ -2,7 +2,7 @@ import {Database} from '@/types/supabase';
 import {createClient} from '@supabase/supabase-js';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-03-31.basil',
@@ -12,12 +12,12 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
   // Server-side Supabase client that bypasses RLS
-const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-});
+  const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
 
   const body = await req.text();
   const signature = (await headers()).get('stripe-signature')!;
@@ -35,60 +35,37 @@ const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey, {
   console.log('Event:', event.type);
 
   switch (event.type) {
-    case 'customer.subscription.created':
-    case 'customer.subscription.updated': {
-      const subscription = event.data.object as Stripe.Subscription;
-      const customerId = subscription.customer as string;
-      const subscriptionId = subscription.id;
-      const status = subscription.status;
-      const priceId = subscription.items.data[0].price.id;
-      const userId = subscription.metadata.userId;
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const userId = session.metadata?.userId;
+      const priceId = session.line_items?.data[0]?.price?.id;
 
-      // Determine subscription type based on price ID
-      const subscriptionType = priceId === process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID ? 'monthly' : 'annual';
+      if (!userId || !priceId) {
+        console.error('Missing userId or priceId in session');
+        return new Response('Missing required data', { status: 400 });
+      }
 
-      console.log('Subscription:', subscription);
+      // Get the number of credits from the price metadata
+      const price = await stripe.prices.retrieve(priceId);
+      const creditsToAdd = price.metadata.credits ? parseInt(price.metadata.credits) : 0;
 
-      // Update subscription in database
+      if (creditsToAdd <= 0) {
+        console.error('Invalid credits amount');
+        return new Response('Invalid credits amount', { status: 400 });
+      }
+
+      // Update user's credits
       const { error } = await supabaseAdmin
-        .from('subscriptions')
-        .update({
-          stripe_customer_id: customerId,
-          stripe_subscription_id: subscriptionId,
-          subscription_type: subscriptionType,
-          status: status === 'active' ? 'active' : 'past_due',
-          updated_at: new Date().toISOString()
-        })
+        .from('credits')
+        .update({ credits: supabaseAdmin.rpc('increment_credits', { user_id: userId, amount: creditsToAdd }) })
         .eq('user_id', userId);
 
       if (error) {
-        console.error('Error updating subscription:', error);
-        return new Response('Error updating subscription', { status: 500 });
+        console.error('Error updating credits:', error);
+        return new Response('Error updating credits', { status: 500 });
       }
 
-      console.log('UPDATE: Subscription updated successfully');
-      break;
-    }
-
-    case 'customer.subscription.deleted': {
-      const subscription = event.data.object as Stripe.Subscription;
-      const userId = subscription.metadata.userId;
-
-      // Update subscription status to canceled
-      const { error } = await supabaseAdmin
-        .from('subscriptions')
-        .update({
-          status: 'canceled',
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId);
-
-      if (error) {
-        console.error('Error updating subscription:', error);
-        return new Response('Error updating subscription', { status: 500 });
-      }
-
-      console.log('DELETE: Subscription updated successfully');
+      console.log('Credits updated successfully');
       break;
     }
   }

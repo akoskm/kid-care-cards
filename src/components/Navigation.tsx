@@ -37,7 +37,7 @@ export default function Navigation() {
   return (
     <>
       {/* Top navigation for user menu */}
-      <div className={`fixed p-4 right-0 ${isSubscribed ? 'top-0' : 'top-8'} z-[60]`}>
+      <div className='fixed p-4 right-0 top-0 z-[60]'>
         <UserMenu />
       </div>
 
