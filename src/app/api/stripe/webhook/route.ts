@@ -32,6 +32,7 @@ export async function POST(req: Request) {
       const subscriptionId = subscription.id;
       const status = subscription.status;
       const priceId = subscription.items.data[0].price.id;
+      const userId = subscription.metadata.userId;
 
       // Determine subscription type based on price ID
       const subscriptionType = priceId === process.env.STRIPE_MONTHLY_PRICE_ID ? 'monthly' : 'annual';
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
           status: status === 'active' ? 'active' : 'past_due',
           updated_at: new Date().toISOString()
         })
-        .eq('stripe_subscription_id', subscriptionId);
+        .eq('user_id', userId);
 
       if (error) {
         console.error('Error updating subscription:', error);
@@ -61,7 +62,7 @@ export async function POST(req: Request) {
 
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription;
-      const subscriptionId = subscription.id;
+      const userId = subscription.metadata.userId;
 
       // Update subscription status to canceled
       const { error } = await supabase
@@ -70,8 +71,7 @@ export async function POST(req: Request) {
           status: 'canceled',
           updated_at: new Date().toISOString()
         })
-        .eq('stripe_subscription_id', subscriptionId);
-
+        .eq('user_id', userId);
 
       if (error) {
         console.error('Error updating subscription:', error);
