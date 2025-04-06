@@ -152,39 +152,47 @@ export default function SettingsPage() {
             </Card>
           )}
 
-          {!isSubscribed && (
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Monthly</CardTitle>
-                  <CardDescription>$5 per month</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    className="w-full"
-                    onClick={() => handleSubscribe(process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID!)}
-                  >
-                    Subscribe Monthly
-                  </Button>
-                </CardContent>
-              </Card>
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className={subscriptionType === 'monthly' ? 'ring-2 ring-primary' : ''}>
+              <CardHeader>
+                <CardTitle>Monthly</CardTitle>
+                <CardDescription>$5 per month</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  className="w-full"
+                  onClick={() => handleSubscribe(process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID!)}
+                  disabled={subscriptionType === 'monthly'}
+                >
+                  {subscriptionType === 'monthly'
+                    ? 'Current Plan'
+                    : isSubscribed
+                    ? 'Switch to Monthly'
+                    : 'Subscribe Monthly'}
+                </Button>
+              </CardContent>
+            </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Annual</CardTitle>
-                  <CardDescription>$50 per year (save $10)</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    className="w-full"
-                    onClick={() => handleSubscribe(process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID!)}
-                  >
-                    Subscribe Annually
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+            <Card className={subscriptionType === 'annual' ? 'ring-2 ring-primary' : ''}>
+              <CardHeader>
+                <CardTitle>Annual</CardTitle>
+                <CardDescription>$50 per year (save $10)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  className="w-full"
+                  onClick={() => handleSubscribe(process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID!)}
+                  disabled={subscriptionType === 'annual'}
+                >
+                  {subscriptionType === 'annual'
+                    ? 'Current Plan'
+                    : isSubscribed
+                    ? 'Switch to Annual'
+                    : 'Subscribe Annually'}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </MainLayout>
