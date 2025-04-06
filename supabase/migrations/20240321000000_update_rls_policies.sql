@@ -76,3 +76,9 @@ create policy "Users can delete their own solutions"
       AND symptoms.user_id = auth.uid()
     )
   );
+
+-- Add update policy for subscriptions
+create policy "Users can update their own subscription"
+  on subscriptions for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);

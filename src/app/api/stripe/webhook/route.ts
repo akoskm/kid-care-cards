@@ -56,7 +56,7 @@ export async function POST(req: Request) {
         return new Response('Error updating subscription', { status: 500 });
       }
 
-      console.log('Subscription updated successfully');
+      console.log('UPDATE: Subscription updated successfully');
       break;
     }
 
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
         return new Response('Error updating subscription', { status: 500 });
       }
 
-      console.log('Subscription updated successfully');
+      console.log('DELETE: Subscription updated successfully');
       break;
     }
   }
