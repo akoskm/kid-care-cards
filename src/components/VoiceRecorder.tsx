@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, Square } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
@@ -12,8 +12,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useAuth } from '@/context/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
+import { useSubscription } from '@/context/SubscriptionContext';
 
 interface VoiceRecorderProps {
   onSuccess?: () => void;
@@ -23,45 +22,10 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
-  const [usageCount, setUsageCount] = useState(0);
-  const [usageLimit, setUsageLimit] = useState(10);
-  const [hasSubscription, setHasSubscription] = useState(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const { toast } = useToast();
-  const { user } = useAuth();
-  const { isSubscribed, isTrialing } = useSubscription();
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchUsageAndSubscription = async () => {
-      // Fetch usage count and limit
-      const { data: usage } = await supabase
-        .from('dictation_usage')
-        .select('usage_count, usage_limit')
-        .eq('user_id', user.id)
-        .single();
-
-      if (usage) {
-        setUsageCount(usage.usage_count);
-        setUsageLimit(usage.usage_limit);
-      }
-
-      // Fetch subscription status
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('status')
-        .eq('user_id', user.id)
-        .single();
-
-      if (subscription?.status === 'active') {
-        setHasSubscription(true);
-      }
-    };
-
-    fetchUsageAndSubscription();
-  }, [user]);
+  const { isSubscribed, isTrialing, dictationUsage, dictationUsageLimit, incrementDictationUsage } = useSubscription();
 
   const startRecording = async () => {
     if (!isSubscribed && !isTrialing) {
@@ -70,7 +34,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
     }
 
     // Check usage limit for non-subscribed users
-    if (!isSubscribed && usageCount >= usageLimit) {
+    if (!isSubscribed && dictationUsage >= dictationUsageLimit) {
       setShowSubscriptionDialog(true);
       return;
     }
@@ -145,14 +109,8 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
 
       if (data?.success) {
         // Update usage count if not subscribed
-        if (!hasSubscription) {
-          const { error: updateError } = await supabase
-            .from('dictation_usage')
-            .update({ usage_count: usageCount + 1 })
-            .eq('user_id', session.user.id);
-
-          if (updateError) throw updateError;
-          setUsageCount(prev => prev + 1);
+        if (!isSubscribed) {
+          await incrementDictationUsage();
         }
 
         toast({

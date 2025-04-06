@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+'use client';
+
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth } from './AuthContext';
 import { supabase } from '@/lib/supabase';
 
 interface SubscriptionStatus {
@@ -10,9 +12,21 @@ interface SubscriptionStatus {
   loading: boolean;
   dictationUsage: number;
   dictationUsageLimit: number;
+  incrementDictationUsage: () => Promise<void>;
 }
 
-export function useSubscription(): SubscriptionStatus {
+const SubscriptionContext = createContext<SubscriptionStatus>({
+  isSubscribed: false,
+  isTrialing: false,
+  trialEndsAt: null,
+  subscriptionType: null,
+  loading: true,
+  dictationUsage: 0,
+  dictationUsageLimit: 10,
+  incrementDictationUsage: async () => {},
+});
+
+export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<SubscriptionStatus>({
     isSubscribed: false,
     isTrialing: false,
@@ -21,9 +35,30 @@ export function useSubscription(): SubscriptionStatus {
     loading: true,
     dictationUsage: 0,
     dictationUsageLimit: 10,
+    incrementDictationUsage: async () => {},
   });
 
   const { user } = useAuth();
+
+  const incrementDictationUsage = async () => {
+    if (!user || status.isSubscribed) return;
+
+    try {
+      const { error } = await supabase
+        .from('dictation_usage')
+        .update({ usage_count: status.dictationUsage + 1 })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setStatus(prev => ({
+        ...prev,
+        dictationUsage: prev.dictationUsage + 1
+      }));
+    } catch (error) {
+      console.error('Error updating dictation usage:', error);
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -59,6 +94,7 @@ export function useSubscription(): SubscriptionStatus {
             loading: false,
             dictationUsage: usage?.usage_count || 0,
             dictationUsageLimit: usage?.usage_limit || 10,
+            incrementDictationUsage,
           });
         } else {
           setStatus({
@@ -69,6 +105,7 @@ export function useSubscription(): SubscriptionStatus {
             loading: false,
             dictationUsage: usage?.usage_count || 0,
             dictationUsageLimit: usage?.usage_limit || 10,
+            incrementDictationUsage,
           });
         }
       } catch (error) {
@@ -78,26 +115,15 @@ export function useSubscription(): SubscriptionStatus {
     };
 
     fetchSubscriptionStatus();
+  }, [user?.id]);
 
-    // Subscribe to changes in the subscriptions table
-    const subscription = supabase
-      .channel('subscription-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'subscriptions',
-          filter: `user_id=eq.${user.id}`,
-        },
-        fetchSubscriptionStatus
-      )
-      .subscribe();
+  return (
+    <SubscriptionContext.Provider value={status}>
+      {children}
+    </SubscriptionContext.Provider>
+  );
+}
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [user]);
-
-  return status;
+export function useSubscription() {
+  return useContext(SubscriptionContext);
 }

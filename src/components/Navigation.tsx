@@ -8,7 +8,7 @@ import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { LayoutDashboard, Users } from 'lucide-react';
 import { UserMenu } from '@/components/UserMenu';
-import {useSubscription} from '@/hooks/useSubscription';
+import { useSubscription } from '@/context/SubscriptionContext';
 
 export default function Navigation() {
   const pathname = usePathname();

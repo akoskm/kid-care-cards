@@ -1,6 +1,6 @@
 "use client";
 
-import { useSubscription } from '@/hooks/useSubscription';
+import { useSubscription } from '@/context/SubscriptionContext';
 import { useAuth } from '@/context/AuthContext';
 import MainLayout from '../main-layout';
 import { Button } from '@/components/ui/button';

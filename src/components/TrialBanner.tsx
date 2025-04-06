@@ -1,6 +1,6 @@
 'use client';
 
-import { useSubscription } from '@/hooks/useSubscription';
+import { useSubscription } from '@/context/SubscriptionContext';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 
