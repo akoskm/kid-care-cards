@@ -45,7 +45,7 @@ const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey, {
       const userId = subscription.metadata.userId;
 
       // Determine subscription type based on price ID
-      const subscriptionType = priceId === process.env.STRIPE_MONTHLY_PRICE_ID ? 'monthly' : 'annual';
+      const subscriptionType = priceId === process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID ? 'monthly' : 'annual';
 
       console.log('Subscription:', subscription);
 
