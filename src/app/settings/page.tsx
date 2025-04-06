@@ -72,6 +72,36 @@ export default function SettingsPage() {
                 )}
               </CardDescription>
             </CardHeader>
+            {isSubscribed && (
+              <CardContent>
+                <Button
+                  className="w-full"
+                  onClick={async () => {
+                    if (!session) return;
+                    try {
+                      const response = await fetch('/api/stripe/create-portal', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${session.access_token}`
+                        }
+                      });
+
+                      if (!response.ok) {
+                        throw new Error('Failed to create portal session');
+                      }
+
+                      const { url } = await response.json();
+                      window.location.href = url;
+                    } catch (error) {
+                      console.error('Error creating portal session:', error);
+                    }
+                  }}
+                >
+                  Manage Subscription
+                </Button>
+              </CardContent>
+            )}
           </Card>
 
           {isTrialing && (
