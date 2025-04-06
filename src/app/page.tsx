@@ -145,7 +145,7 @@ export default function Home() {
               {/* 10 Credits */}
               <div className="bg-white rounded-lg p-8 shadow-lg">
                 <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
-                  10 CREDITS
+                  100 CREDITS
                 </div>
                 <div className="flex items-baseline mb-8">
                   <span className="text-5xl font-bold">$5</span>
@@ -186,7 +186,7 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
-                  25 CREDITS
+                  250 CREDITS
                 </div>
                 <div className="flex items-baseline mb-8">
                   <span className="text-5xl font-bold">$10</span>
@@ -222,7 +222,7 @@ export default function Home() {
               {/* 50 Credits */}
               <div className="bg-white rounded-lg p-8 shadow-lg">
                 <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
-                  50 CREDITS
+                  700 CREDITS
                 </div>
                 <div className="flex items-baseline mb-8">
                   <span className="text-5xl font-bold">$20</span>
