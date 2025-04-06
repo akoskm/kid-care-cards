@@ -68,6 +68,9 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
 
     const fetchSubscriptionStatus = async () => {
       try {
+        // Keep loading true until we have all the data
+        setStatus(prev => ({ ...prev, loading: true }));
+
         // Fetch subscription status
         const { data: subscription } = await supabase
           .from('subscriptions')
@@ -110,6 +113,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         }
       } catch (error) {
         console.error('Error fetching subscription status:', error);
+        // Even on error, we should set loading to false
         setStatus(prev => ({ ...prev, loading: false }));
       }
     };

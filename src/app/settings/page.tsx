@@ -9,15 +9,17 @@ import { formatDistanceToNow } from 'date-fns';
 import { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
-  const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading, dictationUsage, dictationUsageLimit } = useSubscription();
+  const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading: subscriptionLoading, dictationUsage, dictationUsageLimit } = useSubscription();
   const { session, loading: authLoading } = useAuth();
   const [subscriptionEndsAt, setSubscriptionEndsAt] = useState<string | null>(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
 
   useEffect(() => {
     const fetchSubscriptionStatus = async () => {
       if (!session || !isSubscribed) return;
 
       try {
+        setStripeLoading(true);
         const response = await fetch('/api/stripe/subscription-status', {
           headers: {
             'Authorization': `Bearer ${session.access_token}`
@@ -30,6 +32,8 @@ export default function SettingsPage() {
         }
       } catch (error) {
         console.error('Error fetching subscription status:', error);
+      } finally {
+        setStripeLoading(false);
       }
     };
 
@@ -107,9 +111,13 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Subscription Status</CardTitle>
-              <CardDescription>
-                {loading ? 'Loading...' : (
-                  isSubscribed ? (
+              {subscriptionLoading || stripeLoading || !subscriptionType ? (
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                </div>
+              ) : (
+                <CardDescription>
+                  {isSubscribed ? (
                     subscriptionEndsAt ?
                     `Your ${subscriptionType} plan will end on ${new Date(subscriptionEndsAt).toLocaleDateString()}` :
                     `You are currently on the ${subscriptionType} plan`
@@ -117,9 +125,9 @@ export default function SettingsPage() {
                     `Trial ends in ${formatDistanceToNow(trialEndsAt!)}`
                   ) : (
                     'Your trial has ended'
-                  )
-                )}
-              </CardDescription>
+                  )}
+                </CardDescription>
+              )}
             </CardHeader>
             {isSubscribed && (
               <CardContent>
@@ -133,7 +141,7 @@ export default function SettingsPage() {
             )}
           </Card>
 
-          {isTrialing && (
+          {isTrialing && !isSubscribed && !subscriptionEndsAt && (
             <Card>
               <CardHeader>
                 <CardTitle>Dictation Usage</CardTitle>
