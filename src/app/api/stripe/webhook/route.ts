@@ -1,7 +1,9 @@
+import {Database} from '@/types/supabase';
+import {createClient} from '@supabase/supabase-js';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { supabase } from '@/lib/supabase';
-
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-03-31.basil',
 });
@@ -9,6 +11,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
+  // Server-side Supabase client that bypasses RLS
+const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
+
   const body = await req.text();
   const signature = (await headers()).get('stripe-signature')!;
 
@@ -40,7 +50,7 @@ export async function POST(req: Request) {
       console.log('Subscription:', subscription);
 
       // Update subscription in database
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from('subscriptions')
         .update({
           stripe_customer_id: customerId,
@@ -65,7 +75,7 @@ export async function POST(req: Request) {
       const userId = subscription.metadata.userId;
 
       // Update subscription status to canceled
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from('subscriptions')
         .update({
           status: 'canceled',
