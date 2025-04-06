@@ -1,41 +1,14 @@
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
+import { useCredits } from '@/context/CreditContext';
 import MainLayout from '../main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
   const { session, loading: authLoading } = useAuth();
-  const [credits, setCredits] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchCredits = async () => {
-      if (!session) return;
-
-      try {
-        setLoading(true);
-        const response = await fetch('/api/credits', {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`
-          }
-        });
-
-        if (response.ok) {
-          const { credits } = await response.json();
-          setCredits(credits);
-        }
-      } catch (error) {
-        console.error('Error fetching credits:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCredits();
-  }, [session]);
+  const { credits, loading } = useCredits();
 
   const handlePurchaseCredits = async (priceId: string) => {
     if (!session) {
