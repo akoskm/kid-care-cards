@@ -6,10 +6,35 @@ import MainLayout from '../main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDistanceToNow } from 'date-fns';
+import { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
   const { isSubscribed, isTrialing, trialEndsAt, subscriptionType, loading, dictationUsage, dictationUsageLimit } = useSubscription();
   const { session, loading: authLoading } = useAuth();
+  const [subscriptionEndsAt, setSubscriptionEndsAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSubscriptionStatus = async () => {
+      if (!session || !isSubscribed) return;
+
+      try {
+        const response = await fetch('/api/stripe/subscription-status', {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        });
+
+        if (response.ok) {
+          const { subscriptionEndsAt } = await response.json();
+          setSubscriptionEndsAt(subscriptionEndsAt);
+        }
+      } catch (error) {
+        console.error('Error fetching subscription status:', error);
+      }
+    };
+
+    fetchSubscriptionStatus();
+  }, [session, isSubscribed]);
 
   const handleSubscribe = async (priceId: string) => {
     if (!session) {
@@ -34,6 +59,28 @@ export default function SettingsPage() {
       window.location.href = url;
     } catch (error) {
       console.error('Error creating checkout session:', error);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    if (!session) return;
+    try {
+      const response = await fetch('/api/stripe/create-portal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create portal session');
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error('Error creating portal session:', error);
     }
   };
 
@@ -63,6 +110,8 @@ export default function SettingsPage() {
               <CardDescription>
                 {loading ? 'Loading...' : (
                   isSubscribed ? (
+                    subscriptionEndsAt ?
+                    `Your ${subscriptionType} plan will end on ${new Date(subscriptionEndsAt).toLocaleDateString()}` :
                     `You are currently on the ${subscriptionType} plan`
                   ) : isTrialing ? (
                     `Trial ends in ${formatDistanceToNow(trialEndsAt!)}`
@@ -76,27 +125,7 @@ export default function SettingsPage() {
               <CardContent>
                 <Button
                   className="w-full"
-                  onClick={async () => {
-                    if (!session) return;
-                    try {
-                      const response = await fetch('/api/stripe/create-portal', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${session.access_token}`
-                        }
-                      });
-
-                      if (!response.ok) {
-                        throw new Error('Failed to create portal session');
-                      }
-
-                      const { url } = await response.json();
-                      window.location.href = url;
-                    } catch (error) {
-                      console.error('Error creating portal session:', error);
-                    }
-                  }}
+                  onClick={handleManageSubscription}
                 >
                   Manage Subscription
                 </Button>

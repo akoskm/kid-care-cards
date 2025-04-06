@@ -17,7 +17,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-03-31.basil',
 });
 
-export async function POST() {
+export async function GET() {
   try {
     const headersList = await headers();
     const authorization = headersList.get('authorization');
@@ -35,26 +35,24 @@ export async function POST() {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    // Get customer ID from subscriptions table
+    // Get subscription ID from subscriptions table
     const { data: subscriptionData } = await supabaseAdmin
       .from('subscriptions')
-      .select('stripe_customer_id')
+      .select('stripe_subscription_id')
       .eq('user_id', user.id)
       .single();
 
-    if (!subscriptionData?.stripe_customer_id) {
+    if (!subscriptionData?.stripe_subscription_id) {
       return new Response('No subscription found', { status: 404 });
     }
 
-    // Create portal session
-    const session = await stripe.billingPortal.sessions.create({
-      customer: subscriptionData.stripe_customer_id,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
-    });
+    // Get subscription details from Stripe
+    const subscription = await stripe.subscriptions.retrieve(subscriptionData.stripe_subscription_id);
+    const subscriptionEndsAt = subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null;
 
-    return new Response(JSON.stringify({ url: session.url }));
+    return new Response(JSON.stringify({ subscriptionEndsAt }));
   } catch (error) {
-    console.error('Error creating portal session:', error);
-    return new Response('Error creating portal session', { status: 500 });
+    console.error('Error fetching subscription status:', error);
+    return new Response('Error fetching subscription status', { status: 500 });
   }
 }
