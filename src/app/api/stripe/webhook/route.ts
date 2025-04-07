@@ -68,8 +68,8 @@ export async function POST(req: Request) {
       // Update user's credits using RPC function
       const { error } = await supabaseAdmin
         .rpc('increment_credits', {
-          user_id: userId,
-          amount: creditsToAdd
+          p_user_id: userId,
+          p_amount: creditsToAdd
         });
 
       if (error) {
