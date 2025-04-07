@@ -38,11 +38,22 @@ export async function POST(req: Request) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.userId;
-      const priceId = session.line_items?.data[0]?.price?.id;
 
-      if (!userId || !priceId) {
-        console.error('Missing userId or priceId in session');
-        return new Response('Missing required data', { status: 400 });
+      // Retrieve the session with expanded line_items
+      const expandedSession = await stripe.checkout.sessions.retrieve(session.id, {
+        expand: ['line_items'],
+      });
+
+      const priceId = expandedSession.line_items?.data[0]?.price?.id;
+
+      if (!userId) {
+        console.error('Missing userId in session');
+        return new Response('Missing userId', { status: 400 });
+      }
+
+      if (!priceId) {
+        console.error('Missing priceId in session');
+        return new Response('Missing priceId', { status: 400 });
       }
 
       // Get the number of credits from the price metadata
