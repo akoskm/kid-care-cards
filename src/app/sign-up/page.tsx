@@ -44,7 +44,7 @@ export default function SignUpPage() {
 
       if (error) throw error;
 
-      setMessage('Check your email for the confirmation link.');
+      setMessage('Check your email for the confirmation link. (Might take a few minutes to receive)');
 
     } catch (error: unknown) {
       if (error instanceof Error) {
