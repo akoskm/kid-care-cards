@@ -135,106 +135,179 @@ export default function Home() {
         <div id="pricing" className="bg-emerald-500 py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-center text-white mb-4">
-              Get started with 5 free credits
+              Core Features are Free Forever
             </h2>
+            <p className="text-center text-white text-lg mb-4">
+              Track symptoms and solutions at no cost. No credit card required.
+            </p>
             <p className="text-center text-white text-lg mb-12">
-              Purchase additional credits whenever you need them. No subscription required.
+              Additional credits are only needed for Voice Control.
             </p>
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              {/* 10 Credits */}
-              <div className="bg-white rounded-lg p-8 shadow-lg">
-                <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
-                  100 CREDITS
+            <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+              {/* Free Plan */}
+              <div className="bg-white rounded-lg p-8 shadow-lg flex flex-col h-full">
+                <div>
+                  <div className="bg-emerald-50 text-emerald-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                    FREE PLAN
+                  </div>
+                  <div className="flex items-baseline mb-8">
+                    <span className="text-5xl font-bold">$0</span>
+                  </div>
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Track symptoms and solutions
+                    </li>
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Limited Voice Dictation Support
+                    </li>
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Secure data storage
+                    </li>
+                  </ul>
                 </div>
-                <div className="flex items-baseline mb-8">
-                  <span className="text-5xl font-bold">$5</span>
+                <div className="mt-auto">
+                  <Link
+                    href="/sign-up"
+                    className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
+                  >
+                    Start Free
+                  </Link>
                 </div>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    No-charge setup!
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Buy only what you need
-                  </li>
-                </ul>
-                <Link
-                  href="/sign-up"
-                  className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
-                >
-                  Get started
-                </Link>
               </div>
 
-              {/* 25 Credits */}
-              <div className="bg-white rounded-lg p-8 shadow-lg border-4 border-indigo-500 relative">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-indigo-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
-                    BEST VALUE
-                  </span>
+              {/* 100 Credits */}
+              <div className="bg-white rounded-lg p-8 shadow-lg flex flex-col h-full">
+                <div>
+                  <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                    100 CREDITS
+                  </div>
+                  <div className="flex items-baseline mb-8">
+                    <span className="text-5xl font-bold">$5</span>
+                  </div>
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Includes everything from the free plan
+                    </li>
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      No-charge setup!
+                    </li>
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Buy only what you need
+                    </li>
+                  </ul>
                 </div>
-                <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
-                  250 CREDITS
+                <div className="mt-auto">
+                  <Link
+                    href="/sign-up"
+                    className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
+                  >
+                    Get started
+                  </Link>
                 </div>
-                <div className="flex items-baseline mb-8">
-                  <span className="text-5xl font-bold">$10</span>
-                </div>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Save $2.50
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Best value
-                  </li>
-                </ul>
-                <Link
-                  href="/sign-up"
-                  className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
-                >
-                  Get started
-                </Link>
               </div>
 
-              {/* 50 Credits */}
-              <div className="bg-white rounded-lg p-8 shadow-lg">
-                <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
-                  700 CREDITS
+              {/* 250 Credits */}
+              <div className="bg-white rounded-lg p-8 shadow-lg border-4 border-indigo-500 relative flex flex-col h-full">
+                <div>
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-indigo-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                      BEST VALUE
+                    </span>
+                  </div>
+                  <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                    250 CREDITS
+                  </div>
+                  <div className="flex items-baseline mb-8">
+                    <span className="text-5xl font-bold">$10</span>
+                  </div>
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Includes everything from the free plan
+                    </li>
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Save $2.50
+                    </li>
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Best value
+                    </li>
+                  </ul>
                 </div>
-                <div className="flex items-baseline mb-8">
-                  <span className="text-5xl font-bold">$25</span>
+                <div className="mt-auto">
+                  <Link
+                    href="/sign-up"
+                    className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
+                  >
+                    Get started
+                  </Link>
                 </div>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Save $10
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Perfect for frequent use
-                  </li>
-                </ul>
-                <Link
-                  href="/sign-up"
-                  className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
-                >
-                  Get started
-                </Link>
+              </div>
+
+              {/* 700 Credits */}
+              <div className="bg-white rounded-lg p-8 shadow-lg flex flex-col h-full">
+                <div>
+                  <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                    700 CREDITS
+                  </div>
+                  <div className="flex items-baseline mb-8">
+                    <span className="text-5xl font-bold">$25</span>
+                  </div>
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Includes everything from the free plan
+                    </li>
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Save $10
+                    </li>
+                    <li className="flex items-center text-gray-600">
+                      <svg className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Perfect for frequent use
+                    </li>
+                  </ul>
+                </div>
+                <div className="mt-auto">
+                  <Link
+                    href="/sign-up"
+                    className="block text-center bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors w-full"
+                  >
+                    Get started
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
