@@ -61,27 +61,24 @@ export default function SymptomForm({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadChildren = React.useCallback(async () => {
-    try {
-      const data = await secureDataOperations.getChildren();
-      setChildren(data || []);
-      if (data && data.length === 1 && !childId) {
-        setChildId(data[0].id);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError('An unknown error occurred');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [childId]);
-
   useEffect(() => {
+    const loadChildren = async () => {
+      try {
+        const data = await secureDataOperations.getChildren();
+        setChildren(data || []);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadChildren();
-  }, [loadChildren]);
+  }, []);
 
   const handleSubmit = async () => {
     const symptomName = symptom.trim();
@@ -169,18 +166,31 @@ export default function SymptomForm({
             >
               <div>
                 <label className="block text-sm font-medium mb-1">Child (Optional)</label>
-                <Select value={childId} onValueChange={setChildId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a child (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {children.map((child) => (
-                      <SelectItem key={child.id} value={child.id}>
-                        {child.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2">
+                  <Select value={childId || ''} onValueChange={setChildId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a child (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {children.map((child) => (
+                        <SelectItem key={child.id} value={child.id}>
+                          {child.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {childId && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setChildId('')}
+                      title="Clear selection"
+                    >
+                      ×
+                    </Button>
+                  )}
+                </div>
               </div>
 
               <div>

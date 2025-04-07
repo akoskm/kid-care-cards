@@ -210,7 +210,7 @@ export default function SymptomsPage() {
                     ) : (
                       <div>
                         <p className="px-4 mb-4 text-gray-600">Found {searchResults.length} result(s)</p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mb-16">
                           {searchResults.map((card) => (
                             <SymptomCard
                               key={card.id}
@@ -234,7 +234,7 @@ export default function SymptomsPage() {
                       </Button>
                       <VoiceRecorder onSuccess={loadSymptoms} />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mb-14">
                       {cards.length === 0 ? (
                         <div className="col-span-full text-center py-8 text-gray-500">
                           No symptoms recorded yet. Add your first one!
