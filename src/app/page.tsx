@@ -75,8 +75,8 @@ export default function Home() {
               Track symptoms, build a health history, and confidently use what worked before when your child needs you.
             </p>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {/* Feature Card 1 */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Feature Card 1 - Easy Symptom Tracking */}
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg mb-4 flex items-center justify-center">
                   <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,20 +89,7 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Feature Card 2 */}
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="w-12 h-12 bg-emerald-100 rounded-lg mb-4 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Health History</h3>
-                <p className="text-gray-600">
-                  Keep a detailed record of your child&apos;s health journey all in one place.
-                </p>
-              </div>
-
-              {/* Feature Card 3 */}
+              {/* Feature Card 3 - Voice Control */}
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg mb-4 flex items-center justify-center">
                   <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +102,7 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Feature Card 4 */}
+              {/* Feature Card 4 - Secure Data */}
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg mb-4 flex items-center justify-center">
                   <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,6 +112,54 @@ export default function Home() {
                 <h3 className="text-xl font-semibold mb-2">Secure Data</h3>
                 <p className="text-gray-600">
                   Your child&apos;s health information is encrypted and stored securely on our servers.
+                </p>
+              </div>
+
+              {/* Feature Card 2 - Health History */}
+              <div className="bg-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+                <div className="absolute -right-20 top-8 rotate-45 bg-indigo-500 text-white py-1.5 w-64 text-center text-sm font-semibold">
+                  Coming Soon
+                </div>
+                <div className="w-12 h-12 bg-emerald-100 rounded-lg mb-4 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Health History</h3>
+                <p className="text-gray-600">
+                  Keep a detailed record of your child&apos;s health journey all in one place.
+                </p>
+              </div>
+
+              {/* Feature Card 5 - Open Source */}
+              <div className="bg-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+                <div className="absolute -right-20 top-8 rotate-45 bg-indigo-500 text-white py-1.5 w-64 text-center text-sm font-semibold">
+                  Coming Soon
+                </div>
+                <div className="w-12 h-12 bg-emerald-100 rounded-lg mb-4 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Open Source</h3>
+                <p className="text-gray-600">
+                  Transparent and community-driven development. Review and contribute to our codebase.
+                </p>
+              </div>
+
+              {/* Feature Card 6 - Data Export */}
+              <div className="bg-white p-6 rounded-lg shadow-sm relative overflow-hidden">
+                <div className="absolute -right-20 top-8 rotate-45 bg-indigo-500 text-white py-1.5 w-64 text-center text-sm font-semibold">
+                  Coming Soon
+                </div>
+                <div className="w-12 h-12 bg-emerald-100 rounded-lg mb-4 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Export Your Data</h3>
+                <p className="text-gray-600">
+                  Download your health records in multiple formats for easy sharing with healthcare providers.
                 </p>
               </div>
             </div>
