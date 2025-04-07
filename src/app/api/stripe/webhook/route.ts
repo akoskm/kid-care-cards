@@ -65,11 +65,12 @@ export async function POST(req: Request) {
         return new Response('Invalid credits amount', { status: 400 });
       }
 
-      // Update user's credits
+      // Update user's credits using RPC function
       const { error } = await supabaseAdmin
-        .from('credits')
-        .update({ credits: supabaseAdmin.rpc('increment_credits', { user_id: userId, amount: creditsToAdd }) })
-        .eq('user_id', userId);
+        .rpc('increment_credits', {
+          user_id: userId,
+          amount: creditsToAdd
+        });
 
       if (error) {
         console.error('Error updating credits:', error);
