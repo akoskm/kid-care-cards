@@ -69,10 +69,10 @@ export default function Home() {
         <div id="features" className="bg-gray-50 py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-4">
-              Our mission is to help you track health better
+              Our mission is to help parents
             </h2>
             <p className="text-center text-gray-600 mb-12">
-              We back up our mission with intuitive tools and reliable support.
+              Track symptoms, build a health history, and confidently use what worked before when your child needs you.
             </p>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
