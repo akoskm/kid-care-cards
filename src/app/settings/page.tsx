@@ -61,7 +61,7 @@ export default function SettingsPage() {
               <CardTitle>Your Credits</CardTitle>
               {loading ? (
                 <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                  <div className="h-4 bg-muted rounded animate-pulse w-3/4"></div>
                 </div>
               ) : (
                 <CardDescription>
@@ -73,29 +73,29 @@ export default function SettingsPage() {
 
           <div className="grid gap-6 md:grid-cols-3">
             {/* 100 Credits */}
-            <div className="bg-white rounded-lg p-8 shadow-lg">
-              <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+            <div className="bg-card rounded-lg p-8 shadow-lg">
+              <div className="bg-accent/10 text-accent px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
                 100 CREDITS
               </div>
               <div className="flex items-baseline mb-8">
                 <span className="text-5xl font-bold">$5</span>
               </div>
               <ul className="space-y-4 mb-8">
-                <li className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li className="flex items-center text-muted-foreground">
+                  <svg className="w-5 h-5 text-primary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                   No-charge setup!
                 </li>
-                <li className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li className="flex items-center text-muted-foreground">
+                  <svg className="w-5 h-5 text-primary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                   Buy only what you need
                 </li>
               </ul>
               <Button
-                className="w-full bg-emerald-600 text-white"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => handlePurchaseCredits(process.env.NEXT_PUBLIC_STRIPE_SMALL_CREDITS_PRICE_ID!)}
               >
                 Purchase
@@ -103,34 +103,34 @@ export default function SettingsPage() {
             </div>
 
             {/* 250 Credits */}
-            <div className="bg-white rounded-lg p-8 shadow-lg border-4 border-indigo-500 relative">
+            <div className="bg-card rounded-lg p-8 shadow-lg border-4 border-accent relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-indigo-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                <span className="bg-accent text-accent-foreground text-sm font-semibold px-3 py-1 rounded-full">
                   BEST VALUE
                 </span>
               </div>
-              <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+              <div className="bg-accent/10 text-accent px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
                 250 CREDITS
               </div>
               <div className="flex items-baseline mb-8">
                 <span className="text-5xl font-bold">$10</span>
               </div>
               <ul className="space-y-4 mb-8">
-                <li className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li className="flex items-center text-muted-foreground">
+                  <svg className="w-5 h-5 text-primary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                   Save $2.50
                 </li>
-                <li className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li className="flex items-center text-muted-foreground">
+                  <svg className="w-5 h-5 text-primary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                   Best value
                 </li>
               </ul>
               <Button
-                className="w-full bg-emerald-600 text-white"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => handlePurchaseCredits(process.env.NEXT_PUBLIC_STRIPE_MEDIUM_CREDITS_PRICE_ID!)}
               >
                 Purchase
@@ -138,29 +138,29 @@ export default function SettingsPage() {
             </div>
 
             {/* 700 Credits */}
-            <div className="bg-white rounded-lg p-8 shadow-lg">
-              <div className="bg-indigo-50 text-indigo-700 px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+            <div className="bg-card rounded-lg p-8 shadow-lg">
+              <div className="bg-accent/10 text-accent px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
                 700 CREDITS
               </div>
               <div className="flex items-baseline mb-8">
                 <span className="text-5xl font-bold">$25</span>
               </div>
               <ul className="space-y-4 mb-8">
-                <li className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li className="flex items-center text-muted-foreground">
+                  <svg className="w-5 h-5 text-primary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                   Save $10
                 </li>
-                <li className="flex items-center text-gray-600">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li className="flex items-center text-muted-foreground">
+                  <svg className="w-5 h-5 text-primary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                   Perfect for frequent use
                 </li>
               </ul>
               <Button
-                className="w-full bg-emerald-600 text-white"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => handlePurchaseCredits(process.env.NEXT_PUBLIC_STRIPE_LARGE_CREDITS_PRICE_ID!)}
               >
                 Purchase
