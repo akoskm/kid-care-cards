@@ -95,7 +95,7 @@ export default function SettingsPage() {
                 </li>
               </ul>
               <Button
-                className="w-full bg-emerald-600 text-white hover:bg-emerald-700"
+                className="w-full bg-emerald-600 text-white"
                 onClick={() => handlePurchaseCredits(process.env.NEXT_PUBLIC_STRIPE_SMALL_CREDITS_PRICE_ID!)}
               >
                 Purchase
@@ -130,7 +130,7 @@ export default function SettingsPage() {
                 </li>
               </ul>
               <Button
-                className="w-full bg-emerald-600 text-white hover:bg-emerald-700"
+                className="w-full bg-emerald-600 text-white"
                 onClick={() => handlePurchaseCredits(process.env.NEXT_PUBLIC_STRIPE_MEDIUM_CREDITS_PRICE_ID!)}
               >
                 Purchase
@@ -160,7 +160,7 @@ export default function SettingsPage() {
                 </li>
               </ul>
               <Button
-                className="w-full bg-emerald-600 text-white hover:bg-emerald-700"
+                className="w-full bg-emerald-600 text-white"
                 onClick={() => handlePurchaseCredits(process.env.NEXT_PUBLIC_STRIPE_LARGE_CREDITS_PRICE_ID!)}
               >
                 Purchase

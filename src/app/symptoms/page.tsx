@@ -159,7 +159,7 @@ export default function SymptomsPage() {
             <Button
               onClick={handleSearch}
               disabled={isSearching}
-              className="bg-primary hover:bg-emerald-700"
+              className="bg-primary"
             >
               {isSearching ? 'Searching...' : 'Search'}
             </Button>
@@ -228,7 +228,7 @@ export default function SymptomsPage() {
                     <div className="px-4 mb-4 flex items-center gap-2">
                       <Button
                         onClick={() => setShowForm(true)}
-                        className="flex-1 bg-primary hover:bg-emerald-700"
+                        className="flex-1 bg-primary"
                       >
                         Add New Symptom
                       </Button>

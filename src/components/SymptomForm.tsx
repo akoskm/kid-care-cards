@@ -307,7 +307,7 @@ export default function SymptomForm({
           ) : (
             <Button
               onClick={handleSubmit}
-              className="bg-primary hover:bg-emerald-700"
+              className="bg-primary"
               disabled={saving}
             >
               {saving ? (
