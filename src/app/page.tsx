@@ -34,6 +34,15 @@ export default function Home() {
         <div className="container mx-auto py-16 px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
+              <div className="flex justify-start mb-8">
+                <Image
+                  src="/logo.png"
+                  alt="Kid Care Cards Logo"
+                  width={160}
+                  height={160}
+                  className="w-40 h-40 object-contain"
+                />
+              </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Focus more on your children
                 <span className="block text-primary">and less on tracking symptoms</span>
