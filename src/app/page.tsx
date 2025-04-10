@@ -123,22 +123,6 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Feature Card 2 - Health History */}
-              <div className="bg-card p-6 rounded-lg shadow-sm relative overflow-hidden">
-                <div className="absolute -right-20 top-8 rotate-45 bg-accent text-accent-foreground py-1.5 w-64 text-center text-sm font-semibold">
-                  Coming Soon
-                </div>
-                <div className="w-12 h-12 bg-primary/10 rounded-lg mb-4 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Health History</h3>
-                <p className="text-muted-foreground">
-                  Keep a detailed record of your child&apos;s health journey all in one place.
-                </p>
-              </div>
-
               {/* Feature Card 5 - Open Source */}
               <div className="bg-card p-6 rounded-lg shadow-sm relative overflow-hidden">
                 <div className="absolute -right-20 top-8 rotate-45 bg-accent text-accent-foreground py-1.5 w-64 text-center text-sm font-semibold">
