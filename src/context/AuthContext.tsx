@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
+import { saltManager } from '@/lib/salt-manager';
 
 type AuthContextType = {
   session: Session | null;
@@ -23,10 +24,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+
+        // Pre-fetch salt when user logs in or session is initialized
+        if (session?.user?.id) {
+          await saltManager.getUserSalt(session.user.id);
+        }
       }
     );
 
@@ -44,10 +50,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      if (!error && data.session?.user?.id) {
+        await saltManager.getUserSalt(data.session.user.id);
+      }
+
       return { error };
     } catch (error) {
       return { error: error as Error };
@@ -69,6 +80,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+
+    // Clear the salt cache for the current user
+    if (user?.id) {
+      saltManager.clearUserSalt(user.id);
+    }
   };
 
   return (

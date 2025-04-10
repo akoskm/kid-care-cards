@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { saltManager } from './salt-manager';
 
 // Key derivation function using Web Crypto API
 const deriveEncryptionKey = async (userId: string): Promise<CryptoKey> => {
@@ -6,16 +6,8 @@ const deriveEncryptionKey = async (userId: string): Promise<CryptoKey> => {
     throw new Error('No user ID available');
   }
 
-  // Get the user's salt from the database
-  const { data: saltData, error } = await supabase
-    .from('user_salts')
-    .select('salt')
-    .eq('user_id', userId)
-    .single();
-
-  if (error || !saltData) {
-    throw new Error('Failed to retrieve encryption salt');
-  }
+  // Get the user's salt from the salt manager
+  const salt = await saltManager.getUserSalt(userId);
 
   // Convert userId and salt to Uint8Array
   const encoder = new TextEncoder();
@@ -30,7 +22,7 @@ const deriveEncryptionKey = async (userId: string): Promise<CryptoKey> => {
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: encoder.encode(saltData.salt),
+      salt: encoder.encode(salt),
       iterations: 1000,
       hash: 'SHA-256'
     },
