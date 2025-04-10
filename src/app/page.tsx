@@ -120,7 +120,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Secure Data</h3>
                 <p className="text-muted-foreground">
-                  Your child&apos;s health information is encrypted and stored securely on our servers.
+                  Your child&apos;s health information is encrypted and stored securely.
                 </p>
               </div>
 
