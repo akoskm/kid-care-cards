@@ -44,12 +44,11 @@ export default function Home() {
                 />
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                Focus more on your children
-                <span className="block text-primary">and less on tracking symptoms</span>
+                Remember what worked
+                <span className="block text-primary">when your child needs it most</span>
               </h1>
               <p className="text-xl text-muted-foreground mb-8">
-                Kid Care Cards is a symptom tracking system built by parents for parents.
-                We help you monitor your child&apos;s health journey with ease, so you can focus on what matters most.
+                Track solutions that helped your child. When the same issue comes up again, you&apos;ll know exactly what to do.
               </p>
               <Link
                 href="/sign-up"
@@ -78,10 +77,10 @@ export default function Home() {
         <div id="features" className="bg-muted py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-4">
-              Our mission is to help parents
+              Be ready for anything
             </h2>
             <p className="text-center text-muted-foreground mb-12">
-              Track symptoms, build a health history, and confidently use what worked before when your child needs you.
+              Whether it&apos;s 3 AM or your child&apos;s first day at school, you&apos;ll have your proven solutions at hand.
             </p>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -366,7 +365,7 @@ export default function Home() {
                   Kid Care Cards
                 </Link>
                 <p className="text-gray-400 mb-4">
-                  A symptom tracking system built by parents for parents. We exist to help you focus on your children, not paperwork.
+                  A personal solution knowledge base built by parents for parents. Track what worked before, so you&apos;re always prepared.
                 </p>
               </div>
               <div>
@@ -379,15 +378,14 @@ export default function Home() {
               <div>
                 <h3 className="text-white font-semibold mb-4">Support</h3>
                 <ul className="space-y-2">
-                  <li><Link href="#help" className="hover:text-white">Help Center</Link></li>
-                  <li><Link href="#contact" className="hover:text-white">Contact Us</Link></li>
+                  <li><a href="mailto:support@akoskm.com" className="hover:text-white">Contact Us</a></li>
                 </ul>
               </div>
               <div>
                 <h3 className="text-white font-semibold mb-4">Legal</h3>
                 <ul className="space-y-2">
-                  <li><Link href="/privacy" className="hover:text-white">Privacy</Link></li>
-                  <li><Link href="/terms" className="hover:text-white">Terms</Link></li>
+                  <li><Link href="/legal/privacy" className="hover:text-white">Privacy</Link></li>
+                  <li><Link href="/legal/terms" className="hover:text-white">Terms</Link></li>
                 </ul>
               </div>
             </div>
