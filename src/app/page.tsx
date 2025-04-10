@@ -232,7 +232,7 @@ export default function Home() {
               {/* 100 Credits */}
               <div className="bg-card rounded-lg p-8 shadow-lg flex flex-col h-full">
                 <div>
-                  <div className="bg-accent/10 text-accent px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                  <div className="bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
                     100 CREDITS
                   </div>
                   <div className="flex items-baseline mb-8">
@@ -277,7 +277,7 @@ export default function Home() {
                       BEST VALUE
                     </span>
                   </div>
-                  <div className="bg-accent text-accent px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                  <div className="bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
                     250 CREDITS
                   </div>
                   <div className="flex items-baseline mb-8">
@@ -317,7 +317,7 @@ export default function Home() {
               {/* 700 Credits */}
               <div className="bg-card rounded-lg p-8 shadow-lg flex flex-col h-full">
                 <div>
-                  <div className="bg-accent text-accent px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+                  <div className="bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
                     700 CREDITS
                   </div>
                   <div className="flex items-baseline mb-8">

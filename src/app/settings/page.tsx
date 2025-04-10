@@ -74,7 +74,7 @@ export default function SettingsPage() {
           <div className="grid gap-6 md:grid-cols-3">
             {/* 100 Credits */}
             <div className="bg-card rounded-lg p-8 shadow-lg">
-              <div className="bg-accent/10 text-accent px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+              <div className="bg-accent/10 text-primary px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
                 100 CREDITS
               </div>
               <div className="flex items-baseline mb-8">
@@ -109,7 +109,7 @@ export default function SettingsPage() {
                   BEST VALUE
                 </span>
               </div>
-              <div className="bg-accent/10 text-accent px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+              <div className="bg-accent/10 text-primary px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
                 250 CREDITS
               </div>
               <div className="flex items-baseline mb-8">
@@ -139,7 +139,7 @@ export default function SettingsPage() {
 
             {/* 700 Credits */}
             <div className="bg-card rounded-lg p-8 shadow-lg">
-              <div className="bg-accent/10 text-accent px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
+              <div className="bg-accent/10 text-primary px-4 py-1 rounded-full text-sm font-medium inline-block mb-6">
                 700 CREDITS
               </div>
               <div className="flex items-baseline mb-8">
