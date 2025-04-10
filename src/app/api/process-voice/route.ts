@@ -1,48 +1,30 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
-
-// Setup type definitions for built-in Supabase Runtime APIs
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import OpenAI from 'https://esm.sh/openai@4.28.0'
-import { encryptObjectFields } from './encryption.ts'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-user-id',
-}
+import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
+import { encryptFields } from '@/lib/encryption';
 
 // Fields that should be encrypted in each table
 const encryptedFields = {
   symptoms: ['name'] as const,
   solutions: ['description', 'time_to_relief', 'notes'] as const,
-}
+};
 
-console.log("Hello from Functions!")
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
+export async function POST(req: Request) {
   try {
-    console.log("Received request");
-
     // Get the user ID from the request headers
     const userId = req.headers.get('x-user-id');
     if (!userId) {
       throw new Error('User ID is required');
     }
-
-    // Initialize Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
 
     // Check credit balance
     const { data: creditData } = await supabaseClient
@@ -56,35 +38,24 @@ serve(async (req) => {
         JSON.stringify({ error: 'Insufficient credits. Please purchase more credits to continue using dictation.' }),
         {
           status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' }
         }
       );
     }
 
     // Get the audio data from the request
     const body = await req.json();
-    console.log("Request body received:", { hasAudio: !!body.audio, bodyKeys: Object.keys(body) });
-
     const { audio } = body;
     if (!audio) {
-      throw new Error('No audio data provided')
+      throw new Error('No audio data provided');
     }
 
-    // Initialize OpenAI client
-    const openai = new OpenAI({
-      apiKey: Deno.env.get('OPENAI_API_KEY'),
-    })
-
     // Convert base64 audio to buffer
-    console.log("Converting audio to buffer...");
-    const audioBuffer = Uint8Array.from(atob(audio), c => c.charCodeAt(0))
-    console.log("Audio buffer created, size:", audioBuffer.length);
-
-    // Transcribe audio using OpenAI Whisper
-    console.log("Starting transcription...");
+    const audioBuffer = Uint8Array.from(atob(audio), c => c.charCodeAt(0));
     const audioBlob = new Blob([audioBuffer], { type: 'audio/webm' });
     const audioFile = new File([audioBlob], 'audio.webm', { type: 'audio/webm' });
 
+    // Transcribe audio using OpenAI Whisper
     const transcription = await openai.audio.transcriptions.create({
       file: audioFile,
       model: "whisper-1",
@@ -92,7 +63,6 @@ serve(async (req) => {
       temperature: 0,
       language: "en"
     });
-    console.log("Transcription received:", transcription.text);
 
     // Process the transcription to extract symptoms and solutions
     const prompt = `Extract symptoms and solutions from this medical transcription. Format the response as JSON with the following structure:
@@ -116,24 +86,19 @@ serve(async (req) => {
 
     Transcription: ${transcription.text}`
 
-    console.log("Sending prompt to GPT...");
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
       max_tokens: 500,
     });
-    console.log("GPT response received");
 
-    const extractedData = JSON.parse(completion.choices[0].message?.content || '{}')
-    console.log("Extracted data:", JSON.stringify(extractedData, null, 2));
+    const extractedData = JSON.parse(completion.choices[0].message?.content || '{}');
 
     // Insert symptoms and solutions into the database
     for (const symptom of extractedData.symptoms) {
-      console.log("Inserting symptom:", symptom.name);
-
       // Encrypt the symptom data
-      const encryptedSymptom = await encryptObjectFields(symptom, encryptedFields.symptoms, userId);
+      const encryptedSymptom = await encryptFields(symptom, encryptedFields.symptoms, userId);
 
       const { data: symptomData, error: symptomError } = await supabaseClient
         .from('symptoms')
@@ -148,21 +113,21 @@ serve(async (req) => {
         .single()
 
       if (symptomError) {
-        console.error("Error inserting symptom:", symptomError);
         throw symptomError;
       }
 
       if (extractedData.solutions && symptomData) {
-        console.log("Inserting solutions for symptom:", symptom.name);
-
         // Encrypt the solutions data
         const encryptedSolutions = await Promise.all(
-          extractedData.solutions.map(solution =>
-            encryptObjectFields(solution, encryptedFields.solutions, userId)
+          extractedData.solutions.map((solution: {
+            description: string;
+            effectiveness_rating: number;
+            time_to_relief: string;
+            notes: string;
+          }) =>
+            encryptFields(solution, encryptedFields.solutions, userId)
           )
         );
-
-        console.log("Encrypted solutions:", encryptedSolutions);
 
         const solutionsToInsert = encryptedSolutions.map(solution => ({
           symptom_id: symptomData.id,
@@ -177,7 +142,6 @@ serve(async (req) => {
           .insert(solutionsToInsert)
 
         if (solutionsError) {
-          console.error("Error inserting solutions:", solutionsError);
           throw solutionsError;
         }
       }
@@ -189,35 +153,21 @@ serve(async (req) => {
     });
 
     if (updateError) {
-      console.error("Error decrementing credits:", updateError);
       throw updateError;
     }
 
-    console.log("Successfully processed voice recording");
     return new Response(
       JSON.stringify({ success: true, data: extractedData }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+      { headers: { 'Content-Type': 'application/json' } }
+    );
   } catch (error) {
     console.error("Error in process-voice function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' }
       }
-    )
+    );
   }
-})
-
-/* To invoke locally:
-
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
-
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/process-voice' \
-    --header 'Authorization: Bearer ' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
-
-*/
+}

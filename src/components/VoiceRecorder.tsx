@@ -88,19 +88,23 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
         reader.readAsDataURL(audioBlob);
       });
 
-      // Call the Edge Function
-      const { data, error } = await supabase.functions.invoke('process-voice', {
-        body: { audio: base64Audio },
+      // Call the new API route
+      const response = await fetch('/api/process-voice', {
+        method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'x-user-id': user.id,
         },
+        body: JSON.stringify({ audio: base64Audio }),
       });
 
-      if (error) {
-        throw new Error(error.message);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process voice recording');
       }
 
-      if (data?.success) {
+      if (data.success) {
         toast({
           title: 'Success',
           description: 'Voice recording processed successfully!',
