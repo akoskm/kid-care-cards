@@ -13,6 +13,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useCredits } from '@/context/CreditContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface VoiceRecorderProps {
   onSuccess?: () => void;
@@ -26,6 +28,7 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   const audioChunks = useRef<Blob[]>([]);
   const { toast } = useToast();
   const { credits, fetchCredits } = useCredits();
+  const router = useRouter();
 
   const startRecording = async () => {
     if (credits <= 0) {
@@ -172,9 +175,11 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
             <Button onClick={() => setShowSubscriptionDialog(false)} variant="outline">
               Cancel
             </Button>
-            <Button onClick={() => window.location.href = '/settings'}>
-              Purchase Credits
-            </Button>
+            <Link href="/settings">
+              <Button>
+                Purchase Credits
+              </Button>
+            </Link>
           </DialogFooter>
         </DialogContent>
       </Dialog>

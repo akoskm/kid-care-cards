@@ -5,10 +5,28 @@ import { useCredits } from '@/context/CreditContext';
 import MainLayout from '../main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/components/ui/use-toast';
+import { useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function SettingsPage() {
   const { session, loading: authLoading } = useAuth();
-  const { credits, loading } = useCredits();
+  const { credits, loading, fetchCredits } = useCredits();
+  const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const success = searchParams.get('success');
+    if (success === 'true') {
+      toast({
+        title: 'Payment Successful',
+        description: 'Your credits have been added to your account.',
+        variant: 'default',
+      });
+      fetchCredits();
+    }
+  }, [searchParams, toast, fetchCredits]);
 
   const handlePurchaseCredits = async (priceId: string) => {
     if (!session) {
@@ -30,7 +48,7 @@ export default function SettingsPage() {
       }
 
       const { url } = await response.json();
-      window.location.href = url;
+      router.push(url);
     } catch (error) {
       console.error('Error creating checkout session:', error);
     }
