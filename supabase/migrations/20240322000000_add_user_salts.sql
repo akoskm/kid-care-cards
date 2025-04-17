@@ -15,12 +15,15 @@ create policy "Users can view their own salt"
 
 -- Modify handle_new_user function to include salt generation
 create or replace function public.handle_new_user()
-returns trigger as $$
+returns trigger
+language plpgsql
+SET search_path = public, pg_catalog
+as $$
 declare
   new_salt text;
 begin
   -- Generate a random salt
-  new_salt := encode(gen_random_bytes(32), 'hex');
+  new_salt := encode(extensions.gen_random_bytes(32), 'hex');
 
   -- Create user_salts record
   insert into public.user_salts (user_id, salt)
@@ -32,4 +35,4 @@ begin
 
   return new;
 end;
-$$ language plpgsql security definer;
+$$ security definer;

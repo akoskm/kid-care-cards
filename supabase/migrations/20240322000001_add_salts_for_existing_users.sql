@@ -7,6 +7,6 @@ begin
   where not exists (select 1 from user_salts where user_id = id)
   loop
     insert into user_salts (user_id, salt)
-    values (user_record.id, encode(gen_random_bytes(32), 'hex'));
+    values (user_record.id, encode(extensions.gen_random_bytes(32), 'hex'));
   end loop;
 end $$;

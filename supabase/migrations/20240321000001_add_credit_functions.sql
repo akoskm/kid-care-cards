@@ -1,6 +1,8 @@
--- Create function to safely increment credits
-create or replace function increment_credits(p_user_id uuid, p_amount integer)
-returns integer as $$
+CREATE OR REPLACE FUNCTION public.increment_credits(p_user_id uuid, p_amount integer)
+RETURNS integer
+LANGUAGE plpgsql
+SET search_path = ''
+AS $$
 declare
   current_credits integer;
 begin
@@ -24,4 +26,4 @@ begin
 
   return current_credits;
 end;
-$$ language plpgsql security definer;
+$$;

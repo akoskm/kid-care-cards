@@ -25,13 +25,16 @@ create table subscriptions (
 );
 
 -- Create function to update updated_at timestamp
-create or replace function update_updated_at_column()
-returns trigger as $$
+create or replace function public.update_updated_at_column()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
 begin
-  new.updated_at = now();
-  return new;
+    new.updated_at = now();
+    return new;
 end;
-$$ language plpgsql;
+$$;
 
 -- Create triggers for updated_at
 create trigger update_dictation_usage_updated_at
