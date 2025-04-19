@@ -16,6 +16,54 @@ function SettingsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const handleExportData = async () => {
+    if (!session) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/export-data', {
+        headers: {
+          'x-user-id': session.user.id
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to export data');
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob();
+
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filename = contentDisposition
+        ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+        : `kid-care-cards-${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: 'Export Successful',
+        description: 'Your data has been exported successfully.',
+        variant: 'default',
+      });
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      toast({
+        title: 'Export Failed',
+        description: 'There was an error exporting your data. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   useEffect(() => {
     const success = searchParams.get('success');
     if (success === 'true') {
@@ -83,6 +131,28 @@ function SettingsContent() {
                 You have {credits} credits remaining
               </CardDescription>
             )}
+          </CardHeader>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>My Data</CardTitle>
+            <CardDescription>
+              Export all your symptoms and solutions data in CSV format. The export will include:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Symptom details (name, severity, age group)</li>
+                <li>Associated solutions (description, effectiveness, time to relief)</li>
+                <li>Child name (if applicable)</li>
+              </ul>
+            </CardDescription>
+            <div className="mt-4">
+              <Button
+                onClick={handleExportData}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                Export My Data
+              </Button>
+            </div>
           </CardHeader>
         </Card>
 
