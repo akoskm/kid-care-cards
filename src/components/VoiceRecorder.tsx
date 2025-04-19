@@ -19,12 +19,16 @@ interface VoiceRecorderProps {
   onSuccess?: () => void;
 }
 
+const RECORDING_TIME_LIMIT = 5 * 60 * 1000; // 5 minutes in milliseconds
+
 export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
+  const recordingTimer = useRef<NodeJS.Timeout | null>(null);
+  const isRecordingForTimeout = useRef(false);
   const { toast } = useToast();
   const { credits, fetchCredits } = useCredits();
 
@@ -50,6 +54,19 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
 
       mediaRecorder.current.start();
       setIsRecording(true);
+      isRecordingForTimeout.current = true;
+
+      // Set a timer to stop recording after 5 minutes
+      recordingTimer.current = setTimeout(() => {
+        if (isRecordingForTimeout.current) {
+          stopRecording();
+          toast({
+            title: 'Time Limit Reached',
+            description: 'Recording stopped after 5 minutes. You can start a new recording if needed.',
+          });
+        }
+      }, RECORDING_TIME_LIMIT);
+
     } catch (error) {
       console.error('Error accessing microphone:', error);
       toast({
@@ -61,10 +78,17 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   };
 
   const stopRecording = () => {
-    if (mediaRecorder.current && isRecording) {
+    if (mediaRecorder.current && isRecordingForTimeout.current) {
       mediaRecorder.current.stop();
       mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
+      isRecordingForTimeout.current = false;
+
+      // Clear the recording timer
+      if (recordingTimer.current) {
+        clearTimeout(recordingTimer.current);
+        recordingTimer.current = null;
+      }
     }
   };
 
