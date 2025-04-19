@@ -28,8 +28,13 @@ export class SaltManager {
         .eq('user_id', userId)
         .single();
 
-      if (error || !saltData) {
+      if (error) {
+        console.error('Failed to retrieve encryption salt:', error);
         throw new Error('Failed to retrieve encryption salt');
+      }
+
+      if (!saltData) {
+        throw new Error('No salt data found');
       }
 
       return saltData.salt;
