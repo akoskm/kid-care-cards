@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { LockIcon, Download } from 'lucide-react';
+import { LockIcon, Download, CheckCircle } from 'lucide-react';
 
 export default function SignUpPage() {
   const { signUp: authSignUp, session } = useAuth();
@@ -17,7 +17,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Check for existing session only once on component mount
   useEffect(() => {
@@ -37,14 +37,13 @@ export default function SignUpPage() {
 
     try {
       setError(null);
-      setMessage(null);
       setLoading(true);
 
       const { error } = await authSignUp(email, password);
 
       if (error) throw error;
 
-      setMessage('Check your email for the confirmation link. (Might take a few minutes to receive)');
+      setIsSuccess(true);
 
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -71,53 +70,60 @@ export default function SignUpPage() {
             </Alert>
           )}
 
-          {message && (
-            <Alert className="mb-4">
-              <AlertDescription>{message}</AlertDescription>
-            </Alert>
+          {isSuccess ? (
+            <div className="text-center space-y-4">
+              <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
+              <h3 className="text-lg font-semibold">Check your email</h3>
+              <p className="text-muted-foreground">
+                We‘ve sent you a confirmation link. Please check your email to activate your account.
+                (Might take a few minutes to receive)
+              </p>
+            </div>
+          ) : (
+            <>
+              <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoCapitalize="none"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading}
+                >
+                  {loading ? 'Creating account...' : 'Create Account'}
+                </Button>
+              </form>
+
+              <div className="mt-6 space-y-4">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <LockIcon className="h-4 w-4" />
+                  <span>Your data is stored in encrypted format</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <Download className="h-4 w-4" />
+                  <span>No lock-in. Export your data anytime you want</span>
+                </div>
+              </div>
+            </>
           )}
-
-          <form onSubmit={handleSignUp} className="space-y-4">
-            <div className="space-y-2">
-              <Input
-                placeholder="Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoCapitalize="none"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Input
-                placeholder="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
-              {loading ? 'Creating account...' : 'Create Account'}
-            </Button>
-          </form>
-
-          <div className="mt-6 space-y-4">
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <LockIcon className="h-4 w-4" />
-              <span>Your data is stored in encrypted format</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Download className="h-4 w-4" />
-              <span>No lock-in. Export your data anytime you want</span>
-            </div>
-          </div>
         </CardContent>
         <CardFooter className="flex justify-center">
           <div className="text-sm text-muted-foreground">
