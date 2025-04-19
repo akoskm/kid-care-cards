@@ -1,13 +1,13 @@
 import { saltManager } from './salt-manager';
 
 // Key derivation function using Web Crypto API
-const deriveEncryptionKey = async (userId: string): Promise<CryptoKey> => {
+const deriveEncryptionKey = async (userId: string, salt?: string): Promise<CryptoKey> => {
   if (!userId) {
     throw new Error('No user ID available');
   }
 
-  // Get the user's salt from the salt manager
-  const salt = await saltManager.getUserSalt(userId);
+  // Skip salt manager if salt is provided directly
+  const userSalt = salt || await saltManager.getUserSalt(userId);
 
   // Convert userId and salt to Uint8Array
   const encoder = new TextEncoder();
@@ -22,7 +22,7 @@ const deriveEncryptionKey = async (userId: string): Promise<CryptoKey> => {
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: encoder.encode(salt),
+      salt: encoder.encode(userSalt),
       iterations: 1000,
       hash: 'SHA-256'
     },
@@ -34,9 +34,9 @@ const deriveEncryptionKey = async (userId: string): Promise<CryptoKey> => {
 };
 
 // Encrypt data with Web Crypto API
-export const encryptData = async (data: unknown, userId: string): Promise<string> => {
+export const encryptData = async (data: unknown, userId: string, salt?: string): Promise<string> => {
   try {
-    const key = await deriveEncryptionKey(userId);
+    const key = await deriveEncryptionKey(userId, salt);
     const jsonString = JSON.stringify(data);
 
     // Add a version and timestamp to the encrypted data
@@ -73,7 +73,7 @@ export const encryptData = async (data: unknown, userId: string): Promise<string
 };
 
 // Decrypt data using Web Crypto API
-export const decryptData = async (encryptedData: string, userId: string): Promise<unknown> => {
+export const decryptData = async (encryptedData: string, userId: string, salt?: string): Promise<unknown> => {
   try {
     // Decode base64
     const decodedData = atob(encryptedData);
@@ -82,7 +82,7 @@ export const decryptData = async (encryptedData: string, userId: string): Promis
       dataArray[i] = decodedData.charCodeAt(i);
     }
 
-    const key = await deriveEncryptionKey(userId);
+    const key = await deriveEncryptionKey(userId, salt);
 
     // Extract IV (first 12 bytes) and encrypted data
     const iv = dataArray.slice(0, 12);
@@ -118,14 +118,15 @@ export const decryptData = async (encryptedData: string, userId: string): Promis
 export const encryptFields = async <T extends Record<string, unknown>>(
   data: T,
   fieldsToEncrypt: readonly (keyof T)[],
-  userId: string
+  userId: string,
+  salt?: string
 ): Promise<T> => {
   try {
     const encryptedData = { ...data };
 
     for (const field of fieldsToEncrypt) {
       if (data[field] !== undefined && data[field] !== null) {
-        encryptedData[field] = await encryptData(data[field], userId) as T[typeof field];
+        encryptedData[field] = await encryptData(data[field], userId, salt) as T[typeof field];
       }
     }
 
@@ -140,14 +141,15 @@ export const encryptFields = async <T extends Record<string, unknown>>(
 export const decryptFields = async <T extends Record<string, unknown>>(
   data: T,
   fieldsToDecrypt: readonly (keyof T)[],
-  userId: string
+  userId: string,
+  salt?: string
 ): Promise<T> => {
   try {
     const decryptedData = { ...data };
 
     for (const field of fieldsToDecrypt) {
       if (data[field] !== undefined && data[field] !== null) {
-        const decrypted = await decryptData(data[field] as string, userId);
+        const decrypted = await decryptData(data[field] as string, userId, salt);
         // Only update the field if decryption was successful
         if (decrypted !== null) {
           decryptedData[field] = decrypted as T[typeof field];

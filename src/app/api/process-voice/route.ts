@@ -13,10 +13,30 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Initialize Supabase client
+// Initialize Supabase client with service role
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
+
+// Helper function to get user's salt
+async function getUserSalt(userId: string): Promise<string> {
+  const { data: saltData, error } = await supabaseClient
+    .from('user_salts')
+    .select('salt')
+    .eq('user_id', userId)
+    .single();
+
+  if (error) {
+    console.error('Failed to retrieve encryption salt:', error);
+    throw new Error('Failed to retrieve encryption salt');
+  }
+
+  if (!saltData) {
+    throw new Error('No salt data found');
+  }
+
+  return saltData.salt;
+}
 
 export async function POST(req: Request) {
   try {
@@ -25,6 +45,9 @@ export async function POST(req: Request) {
     if (!userId) {
       throw new Error('User ID is required');
     }
+
+    // Get the user's salt
+    const salt = await getUserSalt(userId);
 
     // Check credit balance
     const { data: creditData } = await supabaseClient
@@ -97,8 +120,8 @@ export async function POST(req: Request) {
 
     // Insert symptoms and solutions into the database
     for (const symptom of extractedData.symptoms) {
-      // Encrypt the symptom data
-      const encryptedSymptom = await encryptFields(symptom, encryptedFields.symptoms, userId);
+      // Encrypt the symptom data using the salt
+      const encryptedSymptom = await encryptFields(symptom, encryptedFields.symptoms, userId, salt);
 
       const { data: symptomData, error: symptomError } = await supabaseClient
         .from('symptoms')
@@ -117,7 +140,7 @@ export async function POST(req: Request) {
       }
 
       if (extractedData.solutions && symptomData) {
-        // Encrypt the solutions data
+        // Encrypt the solutions data using the salt
         const encryptedSolutions = await Promise.all(
           extractedData.solutions.map((solution: {
             description: string;
@@ -125,7 +148,7 @@ export async function POST(req: Request) {
             time_to_relief: string;
             notes: string;
           }) =>
-            encryptFields(solution, encryptedFields.solutions, userId)
+            encryptFields(solution, encryptedFields.solutions, userId, salt)
           )
         );
 
