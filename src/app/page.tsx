@@ -123,6 +123,18 @@ export default function Home() {
                 </p>
               </div>
 
+              <div className="bg-card p-6 rounded-lg shadow-sm relative overflow-hidden">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg mb-4 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Export Your Data</h3>
+                <p className="text-muted-foreground">
+                  Download your health records in multiple formats for easy sharing with healthcare providers.
+                </p>
+              </div>
+
               {/* Feature Card 5 - Open Source */}
               <div className="bg-card p-6 rounded-lg shadow-sm relative overflow-hidden">
                 <div className="absolute -right-20 top-8 rotate-45 bg-accent text-accent-foreground py-1.5 w-64 text-center text-sm font-semibold">
@@ -139,21 +151,6 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Feature Card 6 - Data Export */}
-              <div className="bg-card p-6 rounded-lg shadow-sm relative overflow-hidden">
-                <div className="absolute -right-20 top-8 rotate-45 bg-accent text-accent-foreground py-1.5 w-64 text-center text-sm font-semibold">
-                  Coming Soon
-                </div>
-                <div className="w-12 h-12 bg-primary/10 rounded-lg mb-4 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Export Your Data</h3>
-                <p className="text-muted-foreground">
-                  Download your health records in multiple formats for easy sharing with healthcare providers.
-                </p>
-              </div>
             </div>
           </div>
         </div>
