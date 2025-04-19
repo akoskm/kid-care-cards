@@ -120,7 +120,7 @@ function SettingsContent() {
           {/* 250 Credits */}
           <div className="bg-card rounded-lg p-8 shadow-lg border-4 border-accent relative">
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-              <span className="bg-accent text-accent-foreground text-sm font-semibold px-3 py-1 rounded-full">
+              <span className="bg-accent text-accent-foreground text-sm font-semibold px-3 py-1 rounded-full whitespace-nowrap">
                 BEST VALUE
               </span>
             </div>
