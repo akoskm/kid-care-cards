@@ -13,7 +13,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useCredits } from '@/context/CreditContext';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface VoiceRecorderProps {
@@ -28,7 +27,6 @@ export function VoiceRecorder({ onSuccess }: VoiceRecorderProps) {
   const audioChunks = useRef<Blob[]>([]);
   const { toast } = useToast();
   const { credits, fetchCredits } = useCredits();
-  const router = useRouter();
 
   const startRecording = async () => {
     if (credits <= 0) {
