@@ -1,11 +1,11 @@
 {
   "name": "Kid Care Cards",
-  "short_name": "Kid Care",
+  "short_name": "Kid Care Cards",
   "description": "Track your child's symptoms and solutions",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#fffaf5",
+  "theme_color": "#fffaf5",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",

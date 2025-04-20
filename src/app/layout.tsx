@@ -5,6 +5,7 @@ import "@/styles/globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { CreditProvider } from "@/context/CreditContext";
 import { Toaster } from "@/components/ui/toaster";
+import ServiceWorker from "@/components/ServiceWorker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,6 +57,7 @@ export default function RootLayout({
           <CreditProvider>
             {children}
             <Toaster />
+            <ServiceWorker />
           </CreditProvider>
         </AuthProvider>
       </body>
