@@ -1,20 +1,20 @@
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open('kid-care-cards-cache').then((cache) => {
-      return cache.addAll([
-        '/',
-        '/manifest.json',
-        '/icons/icon-192x192.png',
-        '/icons/icon-512x512.png',
-      ]);
-    })
-  );
+self.addEventListener('install', () => {
+  // Just activate the service worker immediately
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  // Take control of all pages immediately
+  event.waitUntil(clients.claim());
 });
 
 self.addEventListener('fetch', (event) => {
+  // Let the browser handle all fetches normally
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .catch(() => {
+        // If fetch fails, return a simple response
+        return new Response('', { status: 200 });
+      })
   );
 });
