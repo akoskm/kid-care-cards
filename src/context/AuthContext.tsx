@@ -20,36 +20,68 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saltLoading, setSaltLoading] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!mounted) return;
+
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
 
-        // Pre-fetch salt when user logs in or session is initialized
         if (session?.user?.id) {
-          await saltManager.getUserSalt(session.user.id);
+          setSaltLoading(true);
+          try {
+            await saltManager.getUserSalt(session.user.id);
+          } catch (error) {
+            console.error('Failed to fetch salt:', error);
+          } finally {
+            if (mounted) {
+              setSaltLoading(false);
+              setLoading(false);
+            }
+          }
+        } else {
+          setLoading(false);
         }
       }
     );
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
+
+      if (session?.user?.id) {
+        setSaltLoading(true);
+        saltManager.getUserSalt(session.user.id)
+          .catch(error => console.error('Failed to fetch salt:', error))
+          .finally(() => {
+            if (mounted) {
+              setSaltLoading(false);
+              setLoading(false);
+            }
+          });
+      } else {
+        setLoading(false);
+      }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
+      setSaltLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -62,6 +94,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error };
     } catch (error) {
       return { error: error as Error };
+    } finally {
+      setSaltLoading(false);
     }
   };
 
@@ -88,7 +122,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{
+      session,
+      user,
+      loading: loading || saltLoading,  // Consider app loading while salt is loading
+      signIn,
+      signUp,
+      signOut
+    }}>
       {children}
     </AuthContext.Provider>
   );
