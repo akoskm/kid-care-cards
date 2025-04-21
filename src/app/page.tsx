@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { Heart } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -15,6 +16,15 @@ export default function Home() {
             <div className="hidden md:flex space-x-6">
               <a href="#features" className="text-muted-foreground hover:text-foreground">Features</a>
               <a href="#pricing" className="text-muted-foreground hover:text-foreground">Pricing</a>
+              <Link
+                href="https://donate.stripe.com/7sI4hl9le2jf21WfYZ"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+              >
+                Donate
+                <Heart className="h-4 w-4 text-red-500 fill-red-500 transform rotate-20" />
+              </Link>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
               <Link href="/sign-in" className="text-primary hover:text-primary/80 whitespace-nowrap text-sm sm:text-base">
@@ -24,7 +34,7 @@ export default function Home() {
                 href="/sign-up"
                 className="bg-primary text-primary-foreground px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-primary/90 text-sm sm:text-base whitespace-nowrap"
               >
-                Request Demo
+                Sign Up
               </Link>
             </div>
           </div>
