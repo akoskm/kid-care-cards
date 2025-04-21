@@ -8,13 +8,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
-  // Let the browser handle all fetches normally
-  event.respondWith(
-    fetch(event.request)
-      .catch(() => {
-        // If fetch fails, return a simple response
-        return new Response('', { status: 200 });
-      })
-  );
+self.addEventListener('fetch', () => {
+  // Don't interfere with fetch requests, let the browser handle everything
+  return;
 });
