@@ -165,6 +165,117 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Hosted vs Self-Hosted Comparison */}
+        <div className="bg-card py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-4">
+              Hosted vs Self-Hosted
+            </h2>
+            <p className="text-center text-muted-foreground mb-12">
+              Choose the deployment option that best fits your needs
+            </p>
+
+            <div className="max-w-4xl mx-auto">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="py-4 px-6 text-left font-medium text-muted-foreground">Feature</th>
+                      <th className="py-4 px-6 text-center">
+                        <div className="bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-medium inline-block">
+                          kidcarecards.com
+                        </div>
+                      </th>
+                      <th className="py-4 px-6 text-center">
+                        <div className="bg-muted text-muted-foreground px-4 py-1 rounded-full text-sm font-medium inline-block">
+                          Self-Hosted
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border">
+                      <td className="py-4 px-6">Setup Time</td>
+                      <td className="py-4 px-6 text-center text-primary">
+                        <span className="font-medium">2 minutes</span>
+                      </td>
+                      <td className="py-4 px-6 text-center text-muted-foreground">
+                        <span className="font-medium">1-2 hours</span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-4 px-6">Monthly Cost</td>
+                      <td className="py-4 px-6 text-center text-primary">
+                        <span className="font-medium">Pay per use</span>
+                      </td>
+                      <td className="py-4 px-6 text-center text-muted-foreground">
+                        <span className="font-medium">$10+ minimum</span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-4 px-6">Automatic Updates</td>
+                      <td className="py-4 px-6 text-center text-primary">
+                        <svg className="w-6 h-6 mx-auto text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </td>
+                      <td className="py-4 px-6 text-center text-muted-foreground">
+                        <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-4 px-6">Infrastructure Management</td>
+                      <td className="py-4 px-6 text-center text-primary">
+                        <span className="font-medium">Fully managed</span>
+                      </td>
+                      <td className="py-4 px-6 text-center text-muted-foreground">
+                        <span className="font-medium">Self managed</span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-4 px-6">Professional Support</td>
+                      <td className="py-4 px-6 text-center text-primary">
+                        <svg className="w-6 h-6 mx-auto text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </td>
+                      <td className="py-4 px-6 text-center text-muted-foreground">
+                        <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-4 px-6">Backups & Security</td>
+                      <td className="py-4 px-6 text-center text-primary">
+                        <svg className="w-6 h-6 mx-auto text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </td>
+                      <td className="py-4 px-6 text-center text-muted-foreground">
+                        <span className="font-medium">DIY</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-4 px-6">Server Maintenance</td>
+                      <td className="py-4 px-6 text-center text-primary">
+                        <svg className="w-6 h-6 mx-auto text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </td>
+                      <td className="py-4 px-6 text-center text-muted-foreground">
+                        <span className="font-medium">Required</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Pricing Section */}
         <div id="pricing" className="bg-primary py-16">
           <div className="container mx-auto px-4">
