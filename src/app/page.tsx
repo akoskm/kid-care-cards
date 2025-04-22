@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart } from 'lucide-react';
+import { Heart, Github } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -24,6 +24,15 @@ export default function Home() {
               >
                 Donate
                 <Heart className="h-4 w-4 text-red-500 fill-red-500 transform rotate-20" />
+              </Link>
+              <Link
+                href="https://github.com/akoskm/kid-care-cards"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+              >
+                GitHub
+                <Github className="h-4 w-4 fill-current" />
               </Link>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
