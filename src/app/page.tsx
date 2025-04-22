@@ -209,7 +209,7 @@ export default function Home() {
                         <span className="font-medium">Pay per use</span>
                       </td>
                       <td className="py-4 px-6 text-center text-muted-foreground">
-                        <span className="font-medium">$10+ minimum</span>
+                        <span className="font-medium">$5/mo VPS + $5 OpenAI credits</span>
                       </td>
                     </tr>
                     <tr className="border-b border-border">
