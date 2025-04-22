@@ -1,8 +1,14 @@
+<p align="center" width="100%">
+  <img alt="Kid Care Cards Logo" src="public/icons/icon-128x128.png">
+</p>
+
 # About the Project
 
 Kid Care Cards is a private, personalized knowledge base to track their children’s symptoms, health solutions, and care outcomes, helping families manage illnesses effectively and confidently.
 
 The data you enter is client-side encrypted using the Web Crypto API, and a user specific salt that is stored in the database and is unique to each user.
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/f375c920-39c3-4052-b08c-603a6e10dc39/deploy-status)](https://app.netlify.com/sites/kidcarecards/deploys)
 
 # Self hosting
 
