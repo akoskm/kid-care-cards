@@ -235,19 +235,6 @@ export default function Home() {
                       </td>
                     </tr>
                     <tr className="border-b border-border">
-                      <td className="py-4 px-6">Professional Support</td>
-                      <td className="py-4 px-6 text-center text-primary">
-                        <svg className="w-6 h-6 mx-auto text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </td>
-                      <td className="py-4 px-6 text-center text-muted-foreground">
-                        <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </td>
-                    </tr>
-                    <tr className="border-b border-border">
                       <td className="py-4 px-6">Backups & Security</td>
                       <td className="py-4 px-6 text-center text-primary">
                         <svg className="w-6 h-6 mx-auto text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
